@@ -1,0 +1,34 @@
+{% if page.organization or page.overview_in_facts %}
+  <dl class="project-facts">
+    {% if page.overview_in_facts and page.description %}
+      <div class="project-facts-overview">
+        <dt>{{ strings.project.overview }}</dt>
+        <dd>{{ page.description }}</dd>
+      </div>
+    {% endif %}
+    {% if page.topics and page.topics.size > 0 %}
+      <div class="project-facts-topics">
+        <dt>{{ strings.project.directions }}</dt>
+        <dd>
+          <ul class="project-fact-values">
+            {% for topic in page.topics %}
+              <li>{{ topic }}</li>
+            {% endfor %}
+          </ul>
+        </dd>
+      </div>
+    {% endif %}
+    {% if page.tech_stack and page.tech_stack.size > 0 %}
+      <div class="project-facts-stack">
+        <dt>{{ strings.project.tech_stack }}</dt>
+        <dd>
+          <ul class="project-fact-values">
+            {% for technology in page.tech_stack %}
+              <li>{{ technology }}</li>
+            {% endfor %}
+          </ul>
+        </dd>
+      </div>
+    {% endif %}
+  </dl>
+{% endif %}

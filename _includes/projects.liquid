@@ -1,0 +1,36 @@
+<li id="{{ project.translation_key }}">
+  <a
+    class="nano-card project-card project-card-primary"
+    data-project-open
+    href="{{ project.url | relative_url }}"
+    aria-labelledby="{{ project.translation_key }}-title"
+    {% if project.description %}
+      aria-describedby="{{ project.translation_key }}-description"
+    {% endif %}
+  >
+    <div class="nano-card-copy">
+      <h2 id="{{ project.translation_key }}-title">{{ project.title }}</h2>
+      {% if project.description %}
+        <p id="{{ project.translation_key }}-description">{{ project.description }}</p>
+      {% endif %}
+    </div>
+    {% include nano-arrow.liquid %}
+    {% if project.period or project.project_date or project.project_type or project.topics.size > 0 %}
+      <ul class="project-card-labels" aria-label="{{ strings.project.labels | default: strings.project.topics }}">
+        {% if project.period %}
+          <li class="project-card-date">{{ project.period }}</li>
+        {% elsif project.project_date %}
+          <li class="project-card-date">
+            <time datetime="{{ project.project_date | date_to_xmlschema }}">{{ project.project_date | date: '%Y-%m-%d' }}</time>
+          </li>
+        {% endif %}
+        {% if project.project_type %}
+          <li class="project-card-kind">{{ strings.project_kind[project.project_type] | default: project.project_type }}</li>
+        {% endif %}
+        {% for topic in project.topics %}
+          <li class="project-card-topic">{{ topic }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </a>
+</li>

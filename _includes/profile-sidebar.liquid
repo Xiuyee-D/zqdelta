@@ -1,0 +1,38 @@
+{% assign current_lang = page.lang | default: site.lang %}
+{% assign strings = site.data.i18n[current_lang] %}
+{% assign author_page = site.pages | where: 'translation_key', 'about' | where: 'lang', current_lang | first %}
+{% capture full_name %}{{ site.first_name }} {{ site.middle_name }} {{ site.last_name }}{% endcapture %}
+{% assign full_name = full_name | strip | replace: '  ', ' ' %}
+{% assign full_name = author_page.profile.name | default: full_name %}
+<aside class="about-profile" aria-label="{{ strings.nav.about }}">
+  {% if author_page.profile.image %}
+    {% assign profile_image_path = author_page.profile.image | prepend: 'assets/img/' %}
+    {%
+      include figure.liquid loading="eager" path=profile_image_path class="about-avatar" sizes="(min-width: 925px) 175px, 75px" alt=full_name
+      cache_bust=true
+    %}
+  {% endif %}
+  <div class="about-profile-details">
+    <p class="about-name">
+      {% if author_page.profile.name or site.title == 'blank' %}{{ full_name }}{% else %}{{ site.title }}{% endif %}
+    </p>
+    {% if author_page.profile.role %}
+      <p class="about-role">{{ author_page.profile.role }}</p>
+    {% endif %}
+    {% if author_page.profile.affiliation %}
+      <p class="about-affiliation">{{ author_page.profile.affiliation }}</p>
+    {% endif %}
+    {% if author_page.profile.bio %}
+      <p class="about-profile-bio">{{ author_page.profile.bio }}</p>
+    {% endif %}
+    {% if author_page.profile.location %}
+      <p class="about-location">
+        {% include profile-icon.liquid name='location' %}
+        <span>{{ author_page.profile.location }}</span>
+      </p>
+    {% endif %}
+    {% if author_page.social %}
+      {% include about-profile-links.liquid %}
+    {% endif %}
+  </div>
+</aside>

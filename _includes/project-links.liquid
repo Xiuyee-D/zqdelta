@@ -1,0 +1,35 @@
+{% assign resource_item = include.item %}
+{% assign project_demo_url = resource_item.website | default: resource_item.redirect %}
+{% assign project_paper_url = resource_item.paper %}
+{% assign project_home = site.pages | where: 'translation_key', 'about' | where: 'lang', current_lang | first %}
+{% if resource_item.publication_key %}
+  {% unless project_paper_url %}
+    {% capture known_publications %}{% bibliography -f publications --template publication %}{% endcapture %}
+    {% assign target_id = 'id="publication-' | append: resource_item.publication_key | append: '"' %}
+    {% if known_publications contains target_id %}
+      {% assign project_paper_url = project_home.url | append: '#publication-' | append: resource_item.publication_key %}
+    {% endif %}
+  {% endunless %}
+{% endif %}
+{% if project_paper_url or resource_item.github or project_demo_url or resource_item.data_url %}
+  <nav class="project-resources" aria-label="{{ resource_item.title | escape }} · {{ strings.project.resources }}">
+    {% if project_paper_url -%}
+      <a href="{% if project_paper_url contains '://' %}{{ project_paper_url }}{% else %}{{ project_paper_url | relative_url }}{% endif %}">
+        {{- strings.project.paper -}}
+      </a>
+    {%- endif %}
+    {% if resource_item.github -%}
+      <a href="{{ resource_item.github }}">{{ strings.project.code }}</a>
+    {%- endif %}
+    {% if project_demo_url -%}
+      <a href="{% if project_demo_url contains '://' %}{{ project_demo_url }}{% else %}{{ project_demo_url | relative_url }}{% endif %}">
+        {{- strings.project.demo -}}
+      </a>
+    {%- endif %}
+    {% if resource_item.data_url -%}
+      <a href="{% if resource_item.data_url contains '://' %}{{ resource_item.data_url }}{% else %}{{ resource_item.data_url | relative_url }}{% endif %}">
+        {{- strings.project.data -}}
+      </a>
+    {%- endif %}
+  </nav>
+{% endif %}

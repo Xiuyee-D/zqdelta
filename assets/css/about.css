@@ -1,0 +1,273 @@
+/* Match the reference homepage's reading column and compact author sidebar. */
+body.about-layout {
+  --about-text-color: var(--global-text-color);
+  --about-frame-max-width: 1280px;
+  /* Matches max_width in _config.yml, used by the header's container. */
+  --about-nav-max-width: 930px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* The progress-bar runtime writes an inline padding after load. Keep the
+     header space identical on the first frame and after navigation. */
+  padding-top: var(--site-header-height) !important;
+  padding-bottom: 0;
+  font-family: var(--academic-font);
+}
+
+html[data-theme="dark"] body.about-layout {
+  --about-text-color: var(--global-text-color);
+}
+
+body.about-layout > .site-frame {
+  flex: 1;
+  width: 100%;
+  max-width: var(--about-frame-max-width);
+  margin-top: 0;
+  padding: 0.75rem 15px 0;
+}
+
+.about-page {
+  --about-rule-color: var(--global-divider-color, #f2f3f3);
+  display: grid;
+  grid-template-columns: 15.2542372881% minmax(0, 1fr);
+  gap: 5.9322033898%;
+  align-items: start;
+  color: var(--about-text-color);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.about-profile {
+  position: sticky;
+  /* Match its unscrolled position: header + frame padding + profile margin. */
+  top: calc(var(--site-header-height) + 0.75rem + 1.35rem);
+  min-width: 0;
+  margin-top: 1.35rem;
+  overflow-wrap: normal;
+}
+
+.about-profile figure {
+  margin: 0 0 0.625rem;
+}
+
+.about-profile .about-avatar {
+  box-sizing: border-box;
+  width: 175px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  padding: 5px;
+  border: 1px solid var(--about-rule-color);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.about-name {
+  margin: 0 0 0.625rem;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.about-affiliation {
+  margin: 0 0 1.25rem;
+  overflow-wrap: normal;
+  word-break: normal;
+  line-height: 1.6;
+}
+
+.about-role {
+  margin: 0 0 0.25rem;
+}
+
+.about-profile-bio {
+  margin: 0 0 1.25rem;
+}
+
+.about-location {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin: 0 0 0.25rem;
+}
+
+.profile-icon {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  vertical-align: -0.15em;
+}
+
+.about-contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-contact-links a {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  min-height: 30px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.about-contact-links a:hover,
+.about-contact-links a:focus-visible {
+  color: var(--global-theme-color);
+  text-decoration: underline;
+}
+
+.about-content {
+  min-width: 0;
+  padding-top: 0.75rem;
+  /* Let the sticky profile use the space beside the content's bottom gap. */
+  padding-bottom: 4rem;
+  overflow-wrap: anywhere;
+}
+
+.about-biography {
+  scroll-margin-top: 5rem;
+}
+
+.home-content {
+  width: 100%;
+  font-size: var(--site-body-size);
+  line-height: var(--site-body-leading);
+}
+
+@media (min-width: 576px) {
+  .home-content {
+    /* The navbar has 1rem outer padding on each side and 0.25rem after
+       its final tool. Stable root gutters keep vw equal to usable width. */
+    width: calc(100% - ((min(100vw, var(--about-frame-max-width)) - min(100vw - 2rem, var(--about-nav-max-width))) / 2 + 0.25rem));
+  }
+}
+
+.home-content .about-opportunity {
+  color: var(--site-accent);
+  font-weight: 400;
+}
+
+.about-opportunity a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.about-opportunity a:hover {
+  color: var(--site-accent-hover);
+}
+
+.about-opportunity a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.home-content h2 {
+  display: flex;
+  gap: 0.35em;
+  align-items: center;
+  margin: 1.4rem 0 0.65rem;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid var(--about-rule-color);
+  color: var(--site-heading-2);
+  font-size: var(--site-section-size);
+  font-weight: 650;
+  line-height: 1.4;
+  scroll-margin-top: 5rem;
+}
+
+.home-content .section-icon {
+  display: inline-block;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.home-content p {
+  margin: 0 0 0.5rem;
+}
+
+.home-content ul {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+}
+
+.home-content li + li {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 924px) {
+  body.about-layout > .site-frame {
+    padding-top: 0.75rem;
+  }
+
+  .about-page {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .about-profile {
+    position: static;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 0;
+  }
+
+  .about-profile figure {
+    flex: 0 0 75px;
+    margin: 0;
+  }
+
+  .about-profile .about-avatar {
+    width: 75px;
+    height: 75px;
+    padding: 0;
+    border: 0;
+  }
+
+  .about-profile-details {
+    min-width: 0;
+  }
+
+  .about-affiliation {
+    margin-bottom: 0.5rem;
+  }
+
+  .about-profile-bio,
+  .about-location,
+  .profile-link-label {
+    display: none;
+  }
+
+  .about-contact-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .about-contact-links a {
+    min-width: 32px;
+    min-height: 32px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .about-content {
+    padding-top: 0;
+    padding-bottom: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .about-name {
+    font-size: 1.125rem;
+  }
+}

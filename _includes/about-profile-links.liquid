@@ -1,0 +1,27 @@
+{% assign socials = site.data.socials %}
+<ul class="about-contact-links">
+  {% if socials.email %}
+    <li>
+      <a href="mailto:{{ socials.email | escape }}" aria-label="{{ strings.profile.email }}: {{ socials.email | escape }}">
+        {% include profile-icon.liquid name='email' %}
+        <span class="profile-link-label">{{ strings.profile.email }}</span>
+      </a>
+    </li>
+  {% endif %}
+  {% if socials.linkedin_username %}
+    <li>
+      <a href="https://www.linkedin.com/in/{{ socials.linkedin_username | uri_escape }}" aria-label="LinkedIn">
+        {% include profile-icon.liquid name='linkedin' %}
+        <span class="profile-link-label">LinkedIn</span>
+      </a>
+    </li>
+  {% endif %}
+  {% if socials.orcid_id %}
+    <li>
+      <a href="https://orcid.org/{{ socials.orcid_id }}" aria-label="ORCID">
+        {% include profile-icon.liquid name='orcid' %}
+        <span class="profile-link-label">ORCID</span>
+      </a>
+    </li>
+  {% endif %}
+</ul>

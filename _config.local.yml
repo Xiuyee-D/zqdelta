@@ -1,0 +1,3 @@
+# Loaded only by bin/dev start. Keep the same project path as GitHub Pages.
+url: http://localhost:4000
+baseurl: /zqdelta

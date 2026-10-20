@@ -1,0 +1,231 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
+DEV_FINGERPRINT="$(cat Dockerfile.dev Gemfile Gemfile.lock | sha256sum | cut -c1-12)"
+DEV_IMAGE="zqdelta-dev:$DEV_FINGERPRINT"
+DEV_CONTAINER="zqdelta-dev-$(printf '%s' "$PROJECT_ROOT" | sha256sum | cut -c1-8)"
+DEV_LABEL="io.zqdelta.workspace"
+
+usage() {
+    cat <<'HELP'
+Usage: ./bin/dev <command>
+  doctor   Check host tools and report missing optional dependencies
+  setup    Build the isolated Ruby image and install project-local npm packages
+  fetch-images  Download base images through the host connection if Docker cannot pull
+  start    Start a background preview at http://localhost:4000/zqdelta/
+  stop     Stop and remove this workspace's preview container
+  restart  Restart preview (needed after changing _config*.yml)
+  logs     Show the last 100 preview log lines
+  status   Show the preview container state
+  build    Build production output into _site/ using _config.yml
+  check [--final]  Run checks and build; --final also requires synchronized English
+  translations [--record]  Check English synchronization (record only after translating)
+  audit-setup  Install optional project-local axe/Lighthouse tools
+  audit [--axe|--lighthouse]  Build and audit the local production site
+  bundle   Run a Bundler command in the image, e.g. ./bin/dev bundle exec jekyll --version
+HELP
+}
+
+require_docker() {
+    if ! command -v docker >/dev/null 2>&1; then
+        echo 'Missing Docker. See docs/LOCAL_DEVELOPMENT.md for installation instructions.' >&2
+        exit 1
+    fi
+    if ! docker info >/dev/null 2>&1; then
+        echo 'Docker is unavailable. Start the existing daemon or check your Docker permissions.' >&2
+        exit 1
+    fi
+}
+
+ensure_image() {
+    require_docker
+    if ! docker image inspect "$DEV_IMAGE" >/dev/null 2>&1; then
+        local build_options=(--build-arg DEBIAN_MIRROR)
+        if [[ -n "${http_proxy:-${HTTP_PROXY:-}}${https_proxy:-${HTTPS_PROXY:-}}" ]]; then
+            build_options+=(--network host --build-arg http_proxy --build-arg https_proxy
+                --build-arg HTTP_PROXY --build-arg HTTPS_PROXY --build-arg no_proxy --build-arg NO_PROXY)
+        fi
+        if docker buildx version >/dev/null 2>&1; then
+            docker build "${build_options[@]}" -f Dockerfile.dev -t "$DEV_IMAGE" .
+        elif [[ -x /usr/libexec/docker/cli-plugins/docker-buildx ]]; then
+            /usr/libexec/docker/cli-plugins/docker-buildx build --load "${build_options[@]}" -f Dockerfile.dev -t "$DEV_IMAGE" .
+        else
+            echo 'Buildx is unavailable; using the existing Docker legacy builder.'
+            DOCKER_BUILDKIT=0 docker build "${build_options[@]}" -f Dockerfile.dev -t "$DEV_IMAGE" .
+        fi
+    fi
+}
+
+fetch_images() {
+    require_docker
+    local crane_arch crane_platform
+    case "$(uname -m)" in
+        x86_64) crane_arch=x86_64; crane_platform=linux/amd64 ;;
+        aarch64|arm64) crane_arch=arm64; crane_platform=linux/arm64 ;;
+        *) echo 'fetch-images supports Linux x86_64 and arm64.' >&2; exit 1 ;;
+    esac
+    mkdir -p .dev-tools
+    if [[ ! -x .dev-tools/crane ]]; then
+        local release=https://github.com/google/go-containerregistry/releases/download/v0.20.3
+        local archive="go-containerregistry_Linux_${crane_arch}.tar.gz"
+        curl -fsSL --retry 3 "$release/$archive" -o ".dev-tools/$archive"
+        curl -fsSL --retry 3 "$release/checksums.txt" -o .dev-tools/checksums.txt
+        (cd .dev-tools && rg "  $archive$" checksums.txt | sha256sum --check --strict)
+        tar -xzf ".dev-tools/$archive" -C .dev-tools crane
+    fi
+    local base_image
+    while read -r base_image; do
+        if ! docker image inspect "$base_image" >/dev/null 2>&1; then
+            echo "Downloading $base_image through the host connection..."
+            .dev-tools/crane pull --platform "$crane_platform" "$base_image" .dev-tools/base-image.tar
+            docker load --input .dev-tools/base-image.tar
+            rm .dev-tools/base-image.tar
+        fi
+    done < <(awk '$1 == "FROM" {print $2}' Dockerfile.dev)
+}
+
+container_exists() {
+    docker container inspect "$DEV_CONTAINER" >/dev/null 2>&1
+}
+
+verify_container() {
+    local owner
+    owner="$(docker inspect --format "{{index .Config.Labels \"$DEV_LABEL\"}}" "$DEV_CONTAINER")"
+    if [[ "$owner" != "$PROJECT_ROOT" ]]; then
+        echo "Container name belongs to another workspace: $DEV_CONTAINER" >&2
+        exit 1
+    fi
+}
+
+run_bundle() {
+    ensure_image
+    local run_options=()
+    if [[ -n "${http_proxy:-${HTTP_PROXY:-}}${https_proxy:-${HTTPS_PROXY:-}}" ]]; then
+        run_options+=(--network host --env http_proxy --env https_proxy
+            --env HTTP_PROXY --env HTTPS_PROXY --env no_proxy --env NO_PROXY)
+    fi
+    docker run --rm --init "${run_options[@]}" \
+        --user "$(id -u):$(id -g)" \
+        --mount "type=bind,source=$PROJECT_ROOT,target=/srv/jekyll" \
+        --env HOME=/tmp --env JEKYLL_ENV=production \
+        "$DEV_IMAGE" bundle "$@"
+}
+
+start_preview() {
+    ensure_image
+    if container_exists; then
+        verify_container
+        if [[ "$(docker inspect --format '{{.State.Running}}' "$DEV_CONTAINER")" == true ]]; then
+            if [[ "$(docker inspect --format '{{.Config.Image}}' "$DEV_CONTAINER")" == "$DEV_IMAGE" ]]; then
+                echo 'Preview is already running: http://localhost:4000/zqdelta/'
+                return
+            fi
+            docker stop "$DEV_CONTAINER" >/dev/null
+        fi
+        docker rm "$DEV_CONTAINER" >/dev/null
+    fi
+    docker run --detach --init --name "$DEV_CONTAINER" \
+        --label "$DEV_LABEL=$PROJECT_ROOT" \
+        --user "$(id -u):$(id -g)" \
+        --publish 127.0.0.1:4000:4000 --publish 127.0.0.1:35729:35729 \
+        --mount "type=bind,source=$PROJECT_ROOT,target=/srv/jekyll" \
+        --env HOME=/tmp --env JEKYLL_ENV=development \
+        "$DEV_IMAGE" bundle exec ruby bin/serve-local.rb serve \
+        --config _config.yml,_config.local.yml \
+        --host 0.0.0.0 --port 4000 --livereload --force_polling \
+        --destination /tmp/_site --disable-disk-cache >/dev/null
+    echo 'Preview is starting: http://localhost:4000/zqdelta/'
+    echo 'Use ./bin/dev logs to check the first build.'
+}
+
+stop_preview() {
+    require_docker
+    if container_exists; then
+        verify_container
+        docker stop "$DEV_CONTAINER" >/dev/null
+        docker rm "$DEV_CONTAINER" >/dev/null
+    fi
+    echo 'Preview stopped.'
+}
+
+case "${1:-help}" in
+    doctor)
+        for tool in git docker node npm ruby; do
+            if command -v "$tool" >/dev/null 2>&1; then
+                "$tool" --version
+            else
+                echo "Missing: $tool (Ruby is optional with Docker; Node/npm are needed for formatting)."
+            fi
+        done
+        require_docker
+        echo "Docker engine: $(docker info --format '{{.ServerVersion}}')"
+        if ! docker compose version >/dev/null 2>&1; then
+            echo 'Optional: Docker Compose is not discoverable by the CLI; bin/dev does not need it.'
+        fi
+        if ! docker buildx version >/dev/null 2>&1 && [[ -x /usr/libexec/docker/cli-plugins/docker-buildx ]]; then
+            echo 'Using installed Buildx directly to bypass the Docker CLI plugin discovery problem.'
+        fi
+        if command -v ruby >/dev/null 2>&1; then
+            ruby -rrbconfig -e 'puts "Host Ruby headers: #{File.file?(File.join(RbConfig::CONFIG["rubyhdrdir"], "ruby.h")) ? "present" : "missing (optional with Docker)"}"'
+        fi
+        ;;
+    setup)
+        ensure_image
+        if command -v npm >/dev/null 2>&1; then
+            npm ci
+        else
+            echo 'Node/npm missing: preview is available, formatting requires Node/npm.'
+        fi
+        ;;
+    fetch-images) fetch_images ;;
+    start) start_preview ;;
+    stop) stop_preview ;;
+    restart) stop_preview; start_preview ;;
+    logs)
+        require_docker
+        if container_exists; then verify_container; docker logs --tail 100 "$DEV_CONTAINER"; else echo 'Preview has not been started.'; fi
+        ;;
+    status)
+        require_docker
+        if container_exists; then verify_container; docker inspect --format '{{.State.Status}}' "$DEV_CONTAINER"; else echo 'stopped'; fi
+        ;;
+    build) run_bundle exec jekyll build ;;
+    check)
+        if [[ -n "${2:-}" && "${2:-}" != --final ]] || [[ $# -gt 2 ]]; then
+            echo 'Usage: ./bin/dev check [--final]' >&2
+            exit 2
+        fi
+        npm run lint:prettier
+        npm run lint:style-contract
+        if [[ "${2:-}" == --final ]]; then
+            run_bundle exec ruby bin/check-translations.rb
+        fi
+        run_bundle exec al-folio upgrade audit --no-fail
+        run_bundle exec al-folio upgrade overrides audit --fail-on-stale
+        run_bundle exec jekyll build
+        ;;
+    translations) shift; run_bundle exec ruby bin/check-translations.rb "$@" ;;
+    audit-setup)
+        audit_packages=()
+        while IFS= read -r audit_package; do audit_packages+=("$audit_package"); done < <(node test/personal_site_quality.cjs --packages)
+        if [[ ${#audit_packages[@]} -eq 0 ]]; then
+            echo 'Unable to resolve optional audit packages; check Node/npm.' >&2
+            exit 1
+        fi
+        npm install --prefix .dev-tools/quality-tools --no-save --package-lock=false --ignore-scripts "${audit_packages[@]}"
+        ;;
+    audit)
+        if [[ $# -gt 2 ]] || [[ -n "${2:-}" && "${2:-}" != --axe && "${2:-}" != --lighthouse ]]; then
+            echo 'Usage: ./bin/dev audit [--axe|--lighthouse]' >&2
+            exit 2
+        fi
+        run_bundle exec jekyll build
+        shift
+        node test/personal_site_quality.cjs "$@"
+        ;;
+    bundle) shift; run_bundle "$@" ;;
+    help|-h|--help) usage ;;
+    *) usage >&2; exit 2 ;;
+esac

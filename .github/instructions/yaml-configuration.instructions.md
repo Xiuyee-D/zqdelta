@@ -1,18 +1,7 @@
-# YAML Configuration Instructions (v1.x)
+# Configuration instructions
 
-Scope: `_config.yml`, `_data/**/*.yml`
+Scope: `_config*.yml`, `_data/**`
 
-## Ownership
-
-- `_config.yml` in starter wires plugins and feature flags.
-- Plugin-specific runtime semantics are owned by plugin repos.
-
-## Guidance
-
-- Keep plugin list and config keys aligned with v1 boundaries.
-- When adding featured plugins, update `_data/featured_plugins.yml`.
-- Validate YAML syntax and avoid stale monolith keys.
-
-## Validation
-
-Use the validated command set in `AGENTS.md`.
+Read [AGENTS.md](../../AGENTS.md) and the [ownership boundaries](../../docs/BOUNDARIES.md).
+Keep plugin wiring consistent across Gemfile, the lockfile and `_config.yml`; preserve `/zqdelta`, publication exclusions and user-edited metadata.
+Use the [local Docker workflow](../../docs/LOCAL_DEVELOPMENT.md), including restarting preview after configuration changes.

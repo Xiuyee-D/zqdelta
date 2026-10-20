@@ -1,0 +1,26 @@
+# Match the Ruby major/minor and patch used by .github/workflows/deploy.yml.
+FROM node:20.19.0-bookworm-slim AS node
+FROM ruby:3.3.5-slim-bookworm
+
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+
+ARG DEBIAN_MIRROR=https://mirrors.ustc.edu.cn
+# These packages are installed inside the image, never on the host.
+RUN sed -i "s|http://deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources \
+    && apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 update \
+    && apt-get install -y --no-install-recommends \
+        build-essential ca-certificates curl git imagemagick \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV EXECJS_RUNTIME=Node \
+    BUNDLE_FROZEN=true \
+    BUNDLE_APP_CONFIG=/tmp/bundle-config \
+    LANG=C.UTF-8
+
+WORKDIR /opt/dependencies
+COPY Gemfile Gemfile.lock ./
+RUN gem install --no-document bundler -v "$(tail -n 1 Gemfile.lock | tr -d ' ')" \
+    && bundle install --jobs 4 --retry 3
+
+WORKDIR /srv/jekyll
+EXPOSE 4000 35729

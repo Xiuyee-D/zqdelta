@@ -1,13 +1,7 @@
-# Markdown Content Instructions (v1.x)
+# Markdown content instructions
 
-Scope: `_pages/**`, `_posts/**`, `_projects/**`, `_news/**`, `_teachings/**`, `_books/**`
+Scope: `_pages/**`, `_posts/**`, `_projects/**`, `_includes/blog-content/**`, `_teachings/**`
 
-## Guidance
-
-- Keep starter content examples aligned with pluginized v1 behavior.
-- Do not document runtime implementation details as starter-owned unless they truly are.
-- When content depends on a plugin feature, ensure plugin wiring exists in `_config.yml` and `Gemfile`.
-
-## Validation
-
-Use the validated command set in `AGENTS.md`.
+Read [AGENTS.md](../../AGENTS.md) and the [content contract](../../docs/CONTENT_CONTRACT.md).
+Edit Chinese first, preserve confirmed facts and stable URLs, and keep blog bodies shared between languages.
+Follow the Docker validation commands in the [local guide](../../docs/LOCAL_DEVELOPMENT.md); standby pages remain private.

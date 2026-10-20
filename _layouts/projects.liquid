@@ -1,0 +1,18 @@
+---
+layout: default
+---
+{% assign current_lang = page.lang | default: site.lang %}
+{% assign strings = site.data.i18n[current_lang] %}
+{% include project-order.liquid %}
+<div class="nano-page projects-page">
+  <header class="nano-header">
+    <h1>{{ page.title }}</h1>
+  </header>
+  <ul class="nano-list">
+    {% for project in ordered_projects -%}
+      {%- include projects.liquid -%}
+    {%- else %}
+      <li class="nano-empty">{{ strings.project.empty_category }}</li>
+    {%- endfor %}
+  </ul>
+</div>

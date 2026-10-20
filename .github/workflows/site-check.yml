@@ -1,0 +1,50 @@
+name: Personal site checks
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DEBIAN_MIRROR: http://deb.debian.org
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.dev-tools/browsers
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Set up the same isolated environment used locally
+        run: ./bin/dev setup
+      - name: Install the CI browser
+        run: npx playwright install --with-deps --only-shell chromium firefox webkit
+      - name: Verify formatting, translations, overrides and the production build
+        run: ./bin/dev check --final
+      - name: Check rendered local links
+        run: npm run test:links
+      - name: Run integration, Chromium regressions, and Firefox/WebKit coverage
+        env:
+          PERSONAL_SITE_NATIVE_BROWSERS: "1"
+          PERSONAL_SITE_HEADED: "1"
+        run: xvfb-run -a npm run test:site
+      - name: Save the verified site
+        uses: actions/upload-artifact@v7
+        with:
+          name: personal-site
+          path: _site/
+          include-hidden-files: true
+      - name: Save diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-diagnostics
+          path: |
+            .dev-tools/test-results/
+            al-folio-upgrade-report.md
+          if-no-files-found: ignore

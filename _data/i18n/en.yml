@@ -1,0 +1,79 @@
+# English counterpart of the finalized Chinese UI text.
+lang: en
+home: /
+other_lang: zh-CN
+switch_title: Switch to Chinese
+nav:
+  about: About
+  publications: Publications
+  projects: Projects
+  awards: Awards
+  blog: Blog
+profile:
+  email: Email
+ui:
+  copy_code: Copy code
+  copied_code: Copied
+  navigation: Toggle navigation
+  theme: Change color theme
+  references: References
+  light_theme: Change theme to light
+  dark_theme: Change theme to dark
+content:
+  empty_blog: No public posts yet.
+  empty_publications: No public publications yet.
+  back_projects: Back to projects
+  back_blog: Back to blog
+  demo: Demo
+  repository: Code
+  paper: Paper
+  abstract: Abstract
+  bibtex: Citation
+  back_top: Back to top
+blog:
+  body_language: "Body: Chinese"
+  toc: On this page
+  series_navigation: Course chapters
+  previous_chapter: Previous chapter
+  next_chapter: Next chapter
+publication:
+  provisional_title: (provisional title)
+  journal_citation_reports: JCR
+  impact_factor: IF
+  status:
+    RRC: Required Reviews Completed
+    UR: Under Review
+project:
+  resources: Project resources
+  topics: Topics
+  labels: Project dates, type, and areas
+  context: Project period and partner organization
+  period: Project period
+  code: Code
+  paper: Paper
+  demo: Demo
+  data: Data
+  related_notes: Related notes
+  related_publication: Related publication
+  previous: Previous project
+  next: Next project
+  empty_category: No public projects yet.
+  organization: Partner organization
+  overview: Project overview
+  directions: Project areas
+  tech_stack: Core technologies
+voice_terminal:
+  title: Voice terminal 3D assembly
+  alt: CAD preview of the assembled voice terminal
+  activate: Explore 3D model
+  loading: Loading model…
+  error: The model is unavailable. You can still view the static preview.
+  retry: Reload 3D model
+  caption: CAD assembly illustration; this model does not include a battery, speaker, or tactile switches. The exploded view illustrates component relationships.
+project_kind:
+  internship: Internship
+  research: Research
+  engineering: Engineering
+  personal: Hobby
+translation_source: _data/i18n/zh-CN.yml
+translation_source_sha256: 2f6db4e5f2b236e222a5e3f1033342e85e4e394327634aef559d384543236dbb

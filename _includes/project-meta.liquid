@@ -1,0 +1,6 @@
+{% assign item = include.item %}
+{% if item.project_type %}
+  <div class="project-meta">
+    <span class="project-card-kind">{{ strings.project_kind[item.project_type] | default: item.project_type }}</span>
+  </div>
+{% endif %}

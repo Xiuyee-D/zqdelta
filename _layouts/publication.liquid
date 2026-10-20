@@ -1,0 +1,143 @@
+---
+---
+{% assign current_lang = page.lang | default: site.lang %}
+{% assign strings = site.data.i18n[current_lang] %}
+{% assign paper_url = entry.html | default: entry.url %}
+{% if paper_url == blank and entry.doi %}{% assign paper_url = entry.doi | prepend: 'https://doi.org/' %}{% endif %}
+{% assign status_code = entry.submission_status | strip | upcase %}
+{% assign venue_name = entry.journal | default: entry.booktitle | default: entry.publisher %}
+{% assign badge_kind = 'venue' %}
+{% if status_code != blank and status_code != 'ACCEPTED' %}
+  {% assign badge_kind = 'status' %}
+  {% assign badge_text = strings.publication.status[status_code] | default: entry.submission_status %}
+{% else %}
+  {% assign badge_text = entry.abbr | default: venue_name %}
+{% endif %}
+{% capture publication_badge %}
+  {% if badge_text != blank %}
+    <span class="publication-badge publication-{{ badge_kind }}"{% if badge_kind == 'venue' and venue_name != blank %} title="{{ venue_name | escape }}"{% endif %}>{{ badge_text | escape }}</span>
+  {% endif %}
+{% endcapture %}
+<div class="publication-entry{% if entry.preview %} has-preview{% endif %}" id="publication-{{ entry.key }}">
+  {% if entry.preview %}
+    <div class="publication-visual">
+      {{ publication_badge }}
+      {% assign preview_path = entry.preview %}
+      {% unless preview_path contains '://' or preview_path contains '/' -%}
+        {%- assign preview_path = preview_path | prepend: '/assets/img/publication_preview/' -%}
+      {%- endunless %}
+      {% assign preview_extension = preview_path | split: '.' | last %}
+      <picture>
+        {% unless preview_path contains '://' %}
+          {% if site.imagemagick.enabled and site.imagemagick.widths contains 480 and preview_extension == 'png' %}
+            {% assign small_preview_path = preview_path | replace: '.png', '-480.webp' %}
+            {% assign retina_preview_path = preview_path | replace: '.png', '-800.webp' %}
+            <source
+              srcset="{{ small_preview_path | relative_url }} 1x{% if site.imagemagick.widths contains 800 %}, {{ retina_preview_path | relative_url }} 2x{% endif %}"
+              type="image/webp"
+            >
+          {% endif %}
+        {% endunless %}
+        <img
+          src="{% if preview_path contains '://' %}{{ preview_path }}{% else %}{{ preview_path | relative_url }}{% endif %}"
+          alt="{{ entry.title | strip_html | escape }}"
+          {% if entry.preview_width and entry.preview_height %}
+            width="{{ entry.preview_width }}"
+            height="{{ entry.preview_height }}"
+          {% endif %}
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
+    </div>
+  {% endif %}
+  <div class="publication-copy">
+    {% unless entry.preview %}{{ publication_badge }}{% endunless %}
+    <p class="publication-citation">
+      {% if entry.author %}
+        {% assign author_count = entry.author_array | size %}
+        {% assign author_limit = entry.author_limit | default: author_count | plus: 0 %}
+        <span class="publication-authors">
+          {% for author in entry.author_array limit: author_limit -%}
+            {%- capture author_label -%}
+              {{- author.last -}},
+              {%- assign given_names = author.first | split: ' ' -%}
+              {%- for given_name in given_names -%}
+                {{- ' ' -}}
+                {%- assign name_parts = given_name | split: '-' -%}
+                {%- for part in name_parts -%}
+                  {{- part | slice: 0 -}}.
+                  {%- unless forloop.last -%}-{%- endunless -%}
+                {%- endfor -%}
+              {%- endfor -%}
+            {%- endcapture -%}
+            {%- if author.first == site.first_name and author.last == site.last_name -%}
+              <strong>{{ author_label }}</strong>
+            {%- else -%}
+              {{- author_label -}}
+            {%- endif -%}
+            {%- unless forloop.last %}, {% endunless -%}
+          {%- endfor -%}
+          {%- if author_count > author_limit %}, et al.{% endif -%}
+        </span>
+      {% endif %}
+      <span class="publication-title">
+        {% if paper_url -%}
+          <a href="{{ paper_url }}">{{ entry.title }}</a>
+        {%- else -%}
+          {{- entry.title -}}
+        {%- endif -%}
+      </span>
+      {%- if entry.title_status == 'provisional' %}
+        <span class="publication-title-note">{{ strings.publication.provisional_title | default: '(provisional title)' }}</span>
+      {%- endif -%}
+      .
+      <em class="publication-journal">{{ entry.journal | default: entry.booktitle | default: entry.publisher }}</em>
+      {%- if entry.year %}, {{ entry.year }}{% endif -%}
+      .
+      {% if entry.jcr_quartile or entry.impact_factor %}
+        <span class="publication-metadata"
+          >(<span class="publication-metrics">
+            {%- if entry.jcr_quartile -%}
+              {{- strings.publication.journal_citation_reports | default: 'JCR' -}}
+              :
+              {{- entry.jcr_quartile -}}
+            {%- endif -%}
+            {%- if entry.jcr_quartile and entry.impact_factor %}; {% endif -%}
+            {%- if entry.impact_factor -%}
+              {{- strings.publication.impact_factor | default: 'IF' -}}
+              :
+              {{- entry.impact_factor -}}
+            {%- endif -%}</span
+          >)</span
+        >
+      {% endif %}
+    </p>
+    {% if entry.pdf or entry.code or entry.website %}
+      <div class="publication-links">
+        {% if entry.pdf %}
+          {% assign pdf_url = entry.pdf %}
+          {% unless pdf_url contains '://' or pdf_url contains '/' %}{% assign pdf_url = pdf_url | prepend: '/assets/pdf/' %}{% endunless %}
+          <a href="{% if pdf_url contains '://' %}{{ pdf_url }}{% else %}{{ pdf_url | relative_url }}{% endif %}">PDF</a>
+        {% endif %}
+        {% if entry.code -%}
+          <a href="{{ entry.code }}">{{ strings.content.repository }}</a>
+        {%- endif %}
+        {% if entry.website -%}
+          <a href="{{ entry.website }}">{{ strings.content.demo }}</a>
+        {%- endif %}
+      </div>
+    {% endif %}
+    {% if entry.abstract %}
+      <details class="publication-abstract" data-disclosure>
+        <summary>
+          {{ strings.content.abstract -}}
+          {%- include nano-arrow.liquid direction='down' %}
+        </summary>
+        <div class="disclosure-body">
+          <p>{{ entry.abstract }}</p>
+        </div>
+      </details>
+    {% endif %}
+  </div>
+</div>

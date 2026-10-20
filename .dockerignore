@@ -1,3 +1,11 @@
 _site/
 .git/
 assets/
+node_modules/
+vendor/
+.venv/
+.jekyll-cache/
+.jekyll-metadata
+output/
+test-results/
+.dev-tools/

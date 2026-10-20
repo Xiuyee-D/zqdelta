@@ -1,0 +1,14 @@
+# Optional, isolated Firefox/WebKit dependencies. The regular site image stays small.
+FROM node:20.19.0-bookworm-slim AS node
+FROM ubuntu:24.04
+COPY --from=node /usr/local/ /usr/local/
+ARG UBUNTU_MIRROR
+RUN if [ -n "$UBUNTU_MIRROR" ]; then sed -i -E "s@http://(archive|security).ubuntu.com/ubuntu/?@$UBUNTU_MIRROR@g" /etc/apt/sources.list.d/ubuntu.sources; fi \
+    && apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /opt/playwright
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts \
+    && ./node_modules/.bin/playwright install-deps firefox webkit \
+    && rm -rf /var/lib/apt/lists/* /root/.npm
+WORKDIR /srv/jekyll

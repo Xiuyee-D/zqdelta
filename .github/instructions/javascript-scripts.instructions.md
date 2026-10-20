@@ -1,18 +1,7 @@
-# JavaScript Instructions (v1.x)
+# JavaScript instructions
 
-Scope: starter JS and related setup scripts
+Scope: `assets/js/**`, `assets/voice-terminal/**`, `test/*.cjs`
 
-## Ownership
-
-- Starter JS should be limited to orchestration/integration behavior.
-- Feature runtime JS belongs in owning plugin repos.
-
-## Guidance
-
-- Do not copy plugin-owned search/icon/math/image runtime code into starter.
-- Keep starter scripts framework-agnostic and compatible with plugin contracts.
-- Prefer deterministic behavior suitable for integration/visual tests.
-
-## Validation
-
-Use the validated command set in `AGENTS.md`.
+Read [AGENTS.md](../../AGENTS.md), the [ownership boundaries](../../docs/BOUNDARIES.md) and the [presentation contract](../../docs/PROJECT_PRESENTATION.md).
+Keep site adapters small and preserve native navigation, reduced-motion fallbacks and shared geometry.
+Run the affected browser suites through the [local workflow](../../docs/LOCAL_DEVELOPMENT.md); CAD changes also follow [VOICE_TERMINAL.md](../../docs/VOICE_TERMINAL.md).

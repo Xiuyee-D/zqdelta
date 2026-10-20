@@ -1,0 +1,76 @@
+lang: zh-CN
+home: /zh/
+other_lang: en
+switch_title: 切换到英文
+nav:
+  about: 关于我
+  publications: 学术论文
+  projects: 项目
+  awards: 获奖
+  blog: 博客
+profile:
+  email: 邮箱
+ui:
+  copy_code: 复制代码
+  copied_code: 已复制
+  navigation: 展开或收起导航
+  theme: 切换显示主题
+  references: 参考文献
+  light_theme: 切换为浅色主题
+  dark_theme: 切换为深色主题
+content:
+  empty_blog: 暂无公开文章。
+  empty_publications: 暂无公开论文。
+  back_projects: 返回项目列表
+  back_blog: 返回博客列表
+  demo: 项目演示
+  repository: 源代码
+  paper: 论文
+  abstract: 摘要
+  bibtex: 引用
+  back_top: 返回顶部
+blog:
+  body_language: 正文：中文
+  toc: 本页目录
+  series_navigation: 课程章节
+  previous_chapter: 上一讲
+  next_chapter: 下一讲
+publication:
+  provisional_title: （暂定标题）
+  journal_citation_reports: JCR
+  impact_factor: IF
+  status:
+    RRC: Required Reviews Completed
+    UR: Under Review
+project:
+  resources: 项目资料
+  topics: 主题
+  labels: 项目时间、类型与项目方向
+  context: 项目时间与合作单位
+  period: 项目时间
+  code: 代码
+  paper: 论文
+  demo: 演示
+  data: 数据
+  related_notes: 相关笔记
+  related_publication: 相关论文
+  previous: 上一个项目
+  next: 下一个项目
+  empty_category: 暂无公开项目。
+  organization: 合作单位
+  overview: 项目概述
+  directions: 项目方向
+  tech_stack: 核心技术
+voice_terminal:
+  title: 语音终端三维装配结构
+  alt: 语音终端整机结构的 CAD 预览
+  activate: 查看交互模型
+  loading: 正在加载模型…
+  error: 模型暂不可用，可继续查看静态预览。
+  retry: 重新加载交互模型
+  caption: 基于 CAD 的装配结构示意；当前模型不含电池、扬声器和轻触开关。展开动画仅说明部件关系。
+project_kind:
+  internship: 实习
+  research: 科研
+  engineering: 工程
+  personal: 兴趣

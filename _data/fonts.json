@@ -1,0 +1,163 @@
+{
+  "family": "Academic Sans",
+  "characters": 7808,
+  "files": [
+    {
+      "file": "academic-sans-latin-25ed5bde4ed2.woff2",
+      "characters": 280,
+      "bytes": 60020
+    },
+    {
+      "file": "academic-sans-common-1b77b01dd70f.woff2",
+      "characters": 434,
+      "bytes": 118680
+    },
+    {
+      "file": "academic-sans-text-01-6f5e2080e10b.woff2",
+      "characters": 256,
+      "bytes": 75112
+    },
+    {
+      "file": "academic-sans-text-02-c4003aa279dd.woff2",
+      "characters": 256,
+      "bytes": 75596
+    },
+    {
+      "file": "academic-sans-text-03-692d832d9311.woff2",
+      "characters": 256,
+      "bytes": 78384
+    },
+    {
+      "file": "academic-sans-text-04-20f9a7080b03.woff2",
+      "characters": 112,
+      "bytes": 39436
+    },
+    {
+      "file": "academic-sans-reserve-01-bfeed54f44aa.woff2",
+      "characters": 256,
+      "bytes": 26532
+    },
+    {
+      "file": "academic-sans-reserve-02-1499c9a6684a.woff2",
+      "characters": 256,
+      "bytes": 113324
+    },
+    {
+      "file": "academic-sans-reserve-03-cdee95206877.woff2",
+      "characters": 256,
+      "bytes": 62612
+    },
+    {
+      "file": "academic-sans-reserve-04-021adec97055.woff2",
+      "characters": 256,
+      "bytes": 65288
+    },
+    {
+      "file": "academic-sans-reserve-05-330120da3f22.woff2",
+      "characters": 256,
+      "bytes": 71816
+    },
+    {
+      "file": "academic-sans-reserve-06-ee34c02d74b3.woff2",
+      "characters": 256,
+      "bytes": 79516
+    },
+    {
+      "file": "academic-sans-reserve-07-9210842a46c4.woff2",
+      "characters": 256,
+      "bytes": 73428
+    },
+    {
+      "file": "academic-sans-reserve-08-c97f855b681d.woff2",
+      "characters": 256,
+      "bytes": 77840
+    },
+    {
+      "file": "academic-sans-reserve-09-f41c5401ca06.woff2",
+      "characters": 256,
+      "bytes": 83772
+    },
+    {
+      "file": "academic-sans-reserve-10-4e0d76bd3d2e.woff2",
+      "characters": 256,
+      "bytes": 81748
+    },
+    {
+      "file": "academic-sans-reserve-11-ed5b2a6b28a8.woff2",
+      "characters": 256,
+      "bytes": 78472
+    },
+    {
+      "file": "academic-sans-reserve-12-0141cb004d04.woff2",
+      "characters": 256,
+      "bytes": 92776
+    },
+    {
+      "file": "academic-sans-reserve-13-534370e37b56.woff2",
+      "characters": 256,
+      "bytes": 83040
+    },
+    {
+      "file": "academic-sans-reserve-14-c2a354670af4.woff2",
+      "characters": 256,
+      "bytes": 79592
+    },
+    {
+      "file": "academic-sans-reserve-15-c031b6f0e79c.woff2",
+      "characters": 256,
+      "bytes": 96396
+    },
+    {
+      "file": "academic-sans-reserve-16-b064493462ef.woff2",
+      "characters": 256,
+      "bytes": 87240
+    },
+    {
+      "file": "academic-sans-reserve-17-7f06826e5e5c.woff2",
+      "characters": 256,
+      "bytes": 71852
+    },
+    {
+      "file": "academic-sans-reserve-18-a95ac2988f40.woff2",
+      "characters": 256,
+      "bytes": 84272
+    },
+    {
+      "file": "academic-sans-reserve-19-9876be85c4b2.woff2",
+      "characters": 256,
+      "bytes": 95060
+    },
+    {
+      "file": "academic-sans-reserve-20-1a2d5d3bed37.woff2",
+      "characters": 256,
+      "bytes": 87580
+    },
+    {
+      "file": "academic-sans-reserve-21-29a4f769837b.woff2",
+      "characters": 256,
+      "bytes": 85056
+    },
+    {
+      "file": "academic-sans-reserve-22-06034d17b215.woff2",
+      "characters": 256,
+      "bytes": 85424
+    },
+    {
+      "file": "academic-sans-reserve-23-8440dd6bb8bd.woff2",
+      "characters": 256,
+      "bytes": 99612
+    },
+    {
+      "file": "academic-sans-reserve-24-778dff5b40ba.woff2",
+      "characters": 256,
+      "bytes": 100296
+    },
+    {
+      "file": "academic-sans-reserve-25-569bbdc1be6c.woff2",
+      "characters": 70,
+      "bytes": 8564
+    }
+  ],
+  "latin": "/assets/fonts/academic-sans-latin-25ed5bde4ed2.woff2",
+  "common": "/assets/fonts/academic-sans-common-1b77b01dd70f.woff2"
+}

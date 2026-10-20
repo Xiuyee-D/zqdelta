@@ -1,0 +1,67 @@
+---
+layout: default
+---
+{% assign current_lang = page.lang | default: site.lang %}
+{% assign strings = site.data.i18n[current_lang] %}
+{% assign language_posts = site.posts | where: 'lang', current_lang | sort: 'date' | reverse %}
+<div class="nano-page blog-page">
+  <header class="nano-header">
+    <h1>{{ page.title }}</h1>
+  </header>
+  {% if language_posts.size > 0 %}
+    <ul class="nano-list" role="list">
+      {% assign cover_count = 0 %}
+      {% for post in language_posts %}
+        <li id="post-{{ post.translation_key }}">
+          <a
+            class="nano-card blog-card{% if post.cover %} has-cover{% endif %}"
+            href="{{ post.url | relative_url }}"
+            lang="{{ post.lang }}"
+            hreflang="{{ post.lang }}"
+          >
+            <h2 class="blog-card-title">
+              {%- if post.series and post.series_order -%}
+                {%- assign series_title = post.series_title | default: post.title | split: '（' | first -%}
+                <span class="blog-card-series">{{- series_title -}}</span>
+                {{- post.title | remove_first: series_title -}}
+              {%- else -%}
+                {{- post.title -}}
+              {%- endif -%}
+            </h2>
+            {% if post.description %}
+              <p class="blog-card-description">{{ post.description }}</p>
+            {% endif %}
+            <div class="blog-card-meta">
+              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y-%m-%d' }}</time>
+              {% if post.body_lang and post.body_lang != post.lang %}
+                <span class="blog-language" lang="{{ current_lang }}">{{ strings.blog.body_language }}</span>
+              {% endif %}
+              {% for tag in post.tags %}
+                <span class="blog-topic">{{ tag }}</span>
+              {% endfor %}
+            </div>
+            {% if post.cover %}
+              {% assign cover_count = cover_count | plus: 1 %}
+              <div class="blog-card-cover{% if post.cover_fit == 'cover' %} is-cropped{% endif %}">
+                <img
+                  src="{{ post.cover | relative_url }}"
+                  alt=""
+                  width="{{ post.cover_width }}"
+                  height="{{ post.cover_height }}"
+                  {% if post.cover_position %}
+                    style="object-position: {{ post.cover_position | escape }}"
+                  {% endif %}
+                  loading="{% if cover_count <= 2 %}eager{% else %}lazy{% endif %}"
+                  decoding="async"
+                >
+              </div>
+            {% endif %}
+            {% include nano-arrow.liquid -%}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="nano-empty">{{ strings.content.empty_blog }}</p>
+  {% endif %}
+</div>

@@ -2,13 +2,17 @@
   "scripts": {
     "lint:prettier": "prettier . --check",
     "lint:style-contract": "node test/style_contract.js",
-    "test:visual": "playwright test --config test/visual/playwright.config.js",
-    "test:visual:update": "playwright test --config test/visual/playwright.config.js --update-snapshots"
+    "test:site": "node test/run-personal-site.cjs",
+    "test:site:integration": "node test/run-personal-site.cjs --integration",
+    "test:site:browser": "node test/run-personal-site.cjs --browser",
+    "test:visual": "npm run test:site:browser",
+    "test:links": "./bin/dev bundle exec ruby test/personal_site_links.rb",
+    "test:site:chromium": "node test/run-personal-site.cjs --chromium",
+    "test:site:cross-browser": "node test/run-personal-site.cjs --compatibility"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "@shopify/prettier-plugin-liquid": "^1.11.1",
-    "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.9.9"
   }

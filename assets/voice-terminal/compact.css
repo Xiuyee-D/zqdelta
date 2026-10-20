@@ -1,0 +1,148 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f8fb;
+  --text: #3b4252;
+  --muted: #566176;
+  --border: #d8dee9;
+  --accent: #476b94;
+  --soft: #e8eef5;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #2e3440;
+  --text: #d8dee9;
+  --muted: #b4bfce;
+  --border: #4c566a;
+  --accent: #88c0d0;
+  --soft: #3b4d61;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+body,
+button {
+  font-family: "Academic Sans", system-ui, sans-serif;
+}
+.vt-app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.vt-stage {
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+canvas:active {
+  cursor: grabbing;
+}
+.vt-hint {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+.vt-loading {
+  position: absolute;
+  inset: 42% 12px auto;
+  text-align: center;
+  font-size: 14px;
+}
+.vt-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+}
+.vt-views {
+  display: flex;
+  gap: 4px;
+}
+button {
+  min-height: 40px;
+  min-width: 58px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+button:hover {
+  color: var(--accent);
+  border-color: var(--border);
+}
+html.theme-changing button {
+  transition-property: none;
+}
+button[aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--soft);
+  font-weight: 600;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+button:focus-visible,
+canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+.vt-label {
+  position: absolute;
+  background: var(--bg);
+  color: var(--text);
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+[hidden] {
+  display: none !important;
+}
+html[data-capture="yes"] .vt-toolbar,
+html[data-capture="yes"] .vt-hint,
+html[data-capture="yes"] #labels {
+  display: none;
+}
+html[data-capture="yes"] .vt-app {
+  grid-template-rows: minmax(0, 1fr);
+}
+@media (max-width: 600px) {
+  button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}

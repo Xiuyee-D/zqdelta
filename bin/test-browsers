@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
+BROWSER_NAMES=("$@")
+if [[ $# -eq 0 ]]; then BROWSER_NAMES=(firefox webkit); fi
+for browser_name in "${BROWSER_NAMES[@]}"; do
+    if [[ "$browser_name" != firefox && "$browser_name" != webkit ]]; then
+        echo 'Usage: bin/test-browsers [firefox] [webkit]' >&2
+        exit 2
+    fi
+done
+# Exact loopback entries avoid routing the local test server through an HTTP proxy.
+export no_proxy="127.0.0.1,localhost,${no_proxy:-${NO_PROXY:-}}"
+export NO_PROXY="$no_proxy"
+export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-$PROJECT_ROOT/.dev-tools/browsers}"
+if [[ "${PERSONAL_SITE_NATIVE_BROWSERS:-0}" == 1 ]]; then
+    failed=0
+    for browser_name in "${BROWSER_NAMES[@]}"; do
+        node test/personal_site_cross_browser.cjs "$browser_name" || failed=1
+    done
+    exit "$failed"
+fi
+if [[ "$(uname -s)" != Linux ]]; then
+    echo 'Use PERSONAL_SITE_NATIVE_BROWSERS=1 with project-local Playwright browsers on macOS/Windows.' >&2
+    exit 1
+fi
+if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
+    echo 'Docker is required for isolated browser dependencies. See docs/LOCAL_DEVELOPMENT.md.' >&2
+    exit 1
+fi
+BROWSER_IMAGE="zqdelta-browsers:$(cat Dockerfile.browser package-lock.json | sha256sum | cut -c1-12)"
+if ! docker image inspect "$BROWSER_IMAGE" >/dev/null 2>&1; then
+    build_options=(--build-arg UBUNTU_MIRROR)
+    if [[ -n "${http_proxy:-${HTTP_PROXY:-}}${https_proxy:-${HTTPS_PROXY:-}}" ]]; then
+        build_options+=(--network host --build-arg http_proxy --build-arg https_proxy --build-arg HTTP_PROXY --build-arg HTTPS_PROXY --build-arg no_proxy --build-arg NO_PROXY)
+    fi
+    if docker buildx version >/dev/null 2>&1; then
+        docker build "${build_options[@]}" -f Dockerfile.browser -t "$BROWSER_IMAGE" .
+    elif [[ -x /usr/libexec/docker/cli-plugins/docker-buildx ]]; then
+        /usr/libexec/docker/cli-plugins/docker-buildx build --load "${build_options[@]}" -f Dockerfile.browser -t "$BROWSER_IMAGE" .
+    else
+        DOCKER_BUILDKIT=0 docker build "${build_options[@]}" -f Dockerfile.browser -t "$BROWSER_IMAGE" .
+    fi
+fi
+mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+run_options=(--rm --init --network host --ipc=host --user "$(id -u):$(id -g)"
+    --mount "type=bind,source=$PROJECT_ROOT,target=/srv/jekyll"
+    --mount "type=bind,source=$PLAYWRIGHT_BROWSERS_PATH,target=/ms-playwright"
+    --env HOME=/tmp --env PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    --env PLAYWRIGHT_DOWNLOAD_HOST --env PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT
+    --env PERSONAL_SITE_URL --env PERSONAL_SITE_HEADED=1 --env LIBGL_ALWAYS_SOFTWARE=1
+    --env http_proxy --env https_proxy --env HTTP_PROXY --env HTTPS_PROXY --env no_proxy --env NO_PROXY)
+docker run "${run_options[@]}" "$BROWSER_IMAGE" /opt/playwright/node_modules/.bin/playwright install "${BROWSER_NAMES[@]}"
+failed=0
+for browser_name in "${BROWSER_NAMES[@]}"; do
+    docker run "${run_options[@]}" "$BROWSER_IMAGE" xvfb-run -a node test/personal_site_cross_browser.cjs "$browser_name" || failed=1
+done
+exit "$failed"

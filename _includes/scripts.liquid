@@ -1,0 +1,24 @@
+<script src="{{ '/assets/js/nav-toggle.js' | relative_url | bust_file_cache }}"></script>
+{% comment %}Kramdown emits these delimiters from the shared Markdown; no duplicated math flags per language.{% endcomment %}
+{% if site.enable_math and site.plugins contains 'al_math' %}
+  {% if content contains '\(' or content contains '\[' %}
+    {% include plugins/al_math_scripts.liquid %}
+  {% endif %}
+{% endif %}
+<script src="{{ '/assets/js/no_defer.js' | relative_url | bust_file_cache }}"></script>
+{% if content contains '<pre' %}
+  <script defer src="{{ '/assets/js/site-code.js' | relative_url | bust_file_cache }}"></script>
+{% endif %}
+{% if site.enable_progressbar %}
+  <script defer src="{{ '/assets/js/progress-bar.js' | relative_url | bust_file_cache }}"></script>
+{% endif %}
+{% if site.back_to_top %}
+  <script
+    src="{{ site.third_party_libraries['vanilla-back-to-top'].url.js }}"
+    integrity="{{ site.third_party_libraries['vanilla-back-to-top'].integrity.js }}"
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    addBackToTop();
+  </script>
+{% endif %}

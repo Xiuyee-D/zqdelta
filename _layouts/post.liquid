@@ -1,0 +1,86 @@
+---
+layout: default
+---
+{% assign current_lang = page.lang | default: site.lang %}
+{% assign strings = site.data.i18n[current_lang] %}
+{% assign blog_index = site.pages | where: 'translation_key', 'blog' | where: 'lang', current_lang | first %}
+{% assign article_content = content %}
+{% if page.body_include %}
+  {% capture shared_body %}{% include {{ page.body_include }} %}{% endcapture %}
+  {% assign article_content = shared_body | markdownify %}
+{% endif %}
+{% assign outline = article_content | toc_only | remove: ' id="blog-toc-list"' %}
+{% for label in page.toc_labels %}
+  {% capture original_label %}>{{ label[0] | escape }}</a>{% endcapture %}
+  {% capture localized_label %}>{{ label[1] | escape }}</a>{% endcapture %}
+  {% assign outline = outline | replace: original_label, localized_label %}
+{% endfor %}
+{% assign has_outline = false %}
+{% if page.toc == true and outline contains '<a ' %}
+  {% assign has_outline = true %}
+{% endif %}
+{% capture return_url %}{{ blog_index.url | relative_url }}#post-{{ page.translation_key }}{% endcapture %}
+<div class="blog-reading-layout{% if has_outline %} has-outline{% endif %}">
+  <div class="nano-page blog-detail">
+    <a class="nano-back" href="{{ return_url }}" data-blog-return>
+      {%- include nano-arrow.liquid direction='back' -%}
+      {{- strings.content.back_blog -}}
+    </a>
+    <header class="nano-header detail-header">
+      <h1>{{ page.title }}</h1>
+      <div class="nano-meta blog-detail-meta">
+        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }}</time>
+        {% if page.body_lang and page.body_lang != current_lang %}
+          <span class="blog-language">{{ strings.blog.body_language }}</span>
+        {% endif %}
+        {% for tag in page.tags %}
+          <span class="blog-topic">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% if page.description %}
+        <p>{{ page.description }}</p>
+      {% endif %}
+    </header>
+    {% if has_outline %}
+      <details class="blog-toc-inline">
+        <summary>{{ strings.blog.toc | default: 'On this page' }}</summary>
+        <nav class="blog-toc-nav" data-blog-toc aria-label="{{ strings.blog.toc | default: 'On this page' }}">{{ outline }}</nav>
+      </details>
+    {% endif %}
+    <article class="nano-prose" lang="{{ page.body_lang | default: current_lang }}">{{ article_content }}</article>
+    {% if page.series %}
+      {% assign chapters = site.posts | where: 'lang', current_lang | where: 'series', page.series | sort: 'series_order' %}
+      <nav class="blog-series-pagination" aria-label="{{ strings.blog.series_navigation | default: 'Course chapters' }}">
+        {% for chapter in chapters %}
+          {% if chapter.translation_key == page.translation_key %}
+            {% unless forloop.first %}
+              {% assign previous_index = forloop.index0 | minus: 1 %}
+              {% assign previous_chapter = chapters[previous_index] %}
+              <a href="{{ previous_chapter.url | relative_url }}">
+                <span>{{ strings.blog.previous_chapter | default: 'Previous chapter' }}</span>
+                {{ previous_chapter.title }}
+              </a>
+            {% endunless %}
+            {% unless forloop.last %}
+              {% assign next_index = forloop.index0 | plus: 1 %}
+              {% assign next_chapter = chapters[next_index] %}
+              <a class="blog-next-chapter" href="{{ next_chapter.url | relative_url }}">
+                <span>{{ strings.blog.next_chapter | default: 'Next chapter' }}</span>
+                {{ next_chapter.title }}
+              </a>
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+      </nav>
+    {% endif %}
+    <a class="blog-bottom-return" href="{{ return_url }}" data-blog-return>{{ strings.content.back_blog }}</a>
+  </div>
+  {% if has_outline %}
+    <aside class="blog-outline">
+      <div class="blog-outline-sticky">
+        <p class="blog-outline-title">{{ strings.blog.toc | default: 'On this page' }}</p>
+        <nav class="blog-toc-nav" data-blog-toc aria-label="{{ strings.blog.toc | default: 'On this page' }}">{{ outline }}</nav>
+      </div>
+    </aside>
+  {% endif %}
+</div>

@@ -1,0 +1,53 @@
+# Optional audits of a published URL. CLI usage follows the upstream README files:
+# https://github.com/GoogleChrome/lighthouse
+# https://github.com/dequelabs/axe-core-npm/tree/develop/packages/cli
+name: Audit a published URL
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: URL to audit
+        default: https://xiuyee-d.github.io/zqdelta/
+        required: true
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AUDIT_URL: ${{ inputs.url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+          install-dependencies: true
+      - name: Install isolated audit tools on the CI runner
+        run: npm install --prefix "$RUNNER_TEMP/site-audits" --no-save --package-lock=false lighthouse@13.5.0 @axe-core/cli@4.14.0
+      - name: Accessibility report
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          AUDIT_CHROMEDRIVER: ${{ steps.chrome.outputs.chromedriver-path }}
+        run: |
+          mkdir -p .dev-tools/quality
+          "$RUNNER_TEMP/site-audits/node_modules/.bin/axe" "$AUDIT_URL" --chromedriver-path "$AUDIT_CHROMEDRIVER" --chrome-path "$CHROME_PATH" --chrome-options="no-sandbox" --load-delay=1500 --save .dev-tools/quality/axe.json --exit
+      - name: Lighthouse report
+        if: always()
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          AUDIT_CHROMEDRIVER: ${{ steps.chrome.outputs.chromedriver-path }}
+        run: |
+          mkdir -p .dev-tools/quality
+          "$RUNNER_TEMP/site-audits/node_modules/.bin/lighthouse" "$AUDIT_URL" --chrome-flags="--headless --no-sandbox" --output=html --output-path=.dev-tools/quality/lighthouse.html
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: published-url-audits
+          path: .dev-tools/quality/
+          if-no-files-found: ignore

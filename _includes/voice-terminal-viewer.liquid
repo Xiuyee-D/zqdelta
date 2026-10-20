@@ -1,0 +1,39 @@
+{% assign vt_lang = page.lang | default: site.lang %}
+{% assign vt = site.data.i18n[vt_lang].voice_terminal %}
+<figure
+  class="voice-terminal"
+  aria-label="{{ vt.title | escape }}"
+  data-voice-terminal
+  data-src="{{ '/assets/voice-terminal/compact.html' | relative_url }}?lang={{ vt_lang | url_encode }}"
+  data-title="{{ vt.title | escape }}"
+  data-loading="{{ vt.loading | escape }}"
+  data-error="{{ vt.error | escape }}"
+  data-retry="{{ vt.retry | escape }}"
+>
+  <div class="voice-terminal-media">
+    <img
+      class="vt-poster-light"
+      src="{{ '/assets/voice-terminal/posters/assembled-light.png' | relative_url }}"
+      alt="{{ vt.alt | escape }}"
+      width="1000"
+      height="1000"
+      loading="lazy"
+      decoding="async"
+    >
+    <img
+      class="vt-poster-dark"
+      src="{{ '/assets/voice-terminal/posters/assembled-dark.png' | relative_url }}"
+      alt="{{ vt.alt | escape }}"
+      width="1000"
+      height="1000"
+      loading="lazy"
+      decoding="async"
+    >
+    <div class="vt-activation">
+      <button type="button" data-vt-activate hidden>{{ vt.activate }}</button>
+      <span data-vt-status role="status"></span>
+    </div>
+  </div>
+  <figcaption>{{ vt.caption }}</figcaption>
+</figure>
+<script type="module" src="{{ '/assets/voice-terminal/compact-embed.js' | relative_url | bust_file_cache }}"></script>

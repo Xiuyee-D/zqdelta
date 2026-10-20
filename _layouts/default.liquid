@@ -1,0 +1,84 @@
+<!doctype html>
+{%- comment -%}
+  al_rtl owns the language and direction attributes when it is installed, because
+  `dir` has to sit on <html> for the browser's bidi handling, CSS logical
+  properties and Tailwind's rtl: variant to apply to the whole document.
+
+  Captured into a variable rather than wrapping the <html> tag in a conditional:
+  a conditional there stops the tag being a single static element, and Prettier
+  then re-indents the entire document body. The guard keeps this parse-safe —
+  without the plugin the tag does not exist and Liquid fails on every page.
+{%- endcomment -%}
+{%- capture html_attributes -%}
+  {%- if site.plugins contains 'al_rtl' -%}
+    {%- include plugins/al_rtl_html_attrs.liquid -%}
+  {%- else -%}
+    lang="{{ site.lang }}"
+  {%- endif -%}
+{%- endcapture -%}
+<html {{ html_attributes }}>
+  <!-- Head -->
+  <head>
+    <link rel="preload" href="{{ site.data.fonts.latin | relative_url }}" as="font" type="font/woff2" crossorigin>
+    {% if page.lang == 'zh-CN' or page.body_lang == 'zh-CN' %}
+      <link rel="preload" href="{{ site.data.fonts.common | relative_url }}" as="font" type="font/woff2" crossorigin>
+    {% endif %}
+    <link rel="stylesheet" href="{{ '/assets/fonts/academic-sans.css' | relative_url | bust_file_cache }}">
+    {% include critical-images.liquid %}
+    {% if page.redirect and page.layout != 'project' %}
+      {% if page.redirect == true %}
+        {% assign redirect = site.baseurl | append: '/' %}
+      {% elsif page.redirect contains '://' %}
+        {% assign redirect = page.redirect %}
+      {% else %}
+        {% assign redirect = page.redirect | relative_url %}
+      {% endif %}
+      <meta http-equiv="refresh" content="3; url={{ redirect }}">
+    {% endif %}
+    {% include head.liquid %}
+    <script src="{{ '/assets/js/site-theme.js' | relative_url | bust_file_cache }}"></script>
+    <link rel="stylesheet" href="{{ '/assets/css/typography.css' | relative_url | bust_file_cache }}">
+    <link rel="stylesheet" href="{{ '/assets/css/about.css' | relative_url | bust_file_cache }}">
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url | bust_file_cache }}">
+    <script src="{{ '/assets/js/site-navigation.js' | relative_url | bust_file_cache }}"></script>
+    {% if page.translation_key %}
+      {% assign translations = site.pages | concat: site.projects | concat: site.posts | where: 'translation_key', page.translation_key %}
+      {% for translation in translations %}
+        <link rel="alternate" hreflang="{{ translation.lang }}" href="{{ translation.url | absolute_url }}">
+      {% endfor %}
+      {% assign default_translation = translations | where: 'lang', 'en' | first %}
+      {% if default_translation %}
+        <link rel="alternate" hreflang="x-default" href="{{ default_translation.url | absolute_url }}">
+      {% endif %}
+    {% endif %}
+  </head>
+
+  <!-- Body -->
+  {% assign current_lang = page.lang | default: site.lang %}
+  <body
+    class="{% if site.navbar_fixed %}fixed-top-nav{% endif %} {% unless site.footer_fixed %}sticky-bottom-footer{% endunless %} about-layout site-layout"
+    data-back-to-top-label="{{ site.data.i18n[current_lang].content.back_top | escape }}"
+    data-copy-code-label="{{ site.data.i18n[current_lang].ui.copy_code | escape }}"
+    data-copied-code-label="{{ site.data.i18n[current_lang].ui.copied_code | escape }}"
+  >
+    <!-- Header -->
+    {% include header.liquid %}
+
+    <!-- Content -->
+    <div class="container site-frame">
+      <div class="about-page">
+        {% include profile-sidebar.liquid %}
+        <main id="main-content" class="about-content site-content" tabindex="-1" data-page-content>
+          {{ content }}
+        </main>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    {% include footer.liquid %}
+
+    <!-- JavaScripts -->
+    {% include scripts.liquid %}
+    <script src="{{ '/assets/js/site.js' | relative_url | bust_file_cache }}" defer></script>
+  </body>
+</html>

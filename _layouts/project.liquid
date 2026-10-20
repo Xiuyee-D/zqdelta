@@ -1,0 +1,101 @@
+---
+layout: default
+---
+{% assign current_lang = page.lang | default: site.lang %}
+{% assign strings = site.data.i18n[current_lang] %}
+{% assign project_index = site.pages | where: 'translation_key', 'projects' | where: 'lang', current_lang | first %}
+{% assign return_url = project_index.url | relative_url | append: '#' | append: page.translation_key %}
+{% include project-order.liquid %}
+{% assign previous_project = null %}
+{% assign next_project = null %}
+{% assign found_current = false %}
+{% for sibling in ordered_projects %}
+  {% if found_current -%}
+    {%- assign next_project = sibling -%}
+    {%- break -%}
+  {%- endif %}
+  {% if sibling.translation_key == page.translation_key %}
+    {% assign found_current = true %}
+  {% else %}
+    {% assign previous_project = sibling %}
+  {% endif %}
+{% endfor %}
+<div class="nano-page project-detail">
+  <a class="nano-back" data-project-return href="{{ return_url }}">
+    {% include nano-arrow.liquid direction='back' -%}
+    {{- strings.content.back_projects }}
+  </a>
+  <header class="nano-header detail-header">
+    <div class="project-title-row">
+      <h1>{{ page.title }}</h1>
+      {% if page.project_type %}
+        {% include project-meta.liquid item=page kind_only=true %}
+      {% endif %}
+    </div>
+    {% if page.period or page.project_date or page.organization %}
+      <ul class="project-context" aria-label="{{ strings.project.context }}">
+        {% if page.period %}
+          <li class="project-context-period">
+            <span class="sr-only">
+              {{- strings.project.period -}}
+              {%- if current_lang == 'zh-CN' %}：{% else %}: {% endif -%}
+            </span>
+            {{- page.period }}
+          </li>
+        {% elsif page.project_date %}
+          <li class="project-context-period">
+            <span class="sr-only">
+              {{- strings.project.period -}}
+              {%- if current_lang == 'zh-CN' %}：{% else %}: {% endif -%}
+            </span>
+            <time datetime="{{ page.project_date | date_to_xmlschema }}">{{ page.project_date | date: '%Y-%m-%d' }}</time>
+          </li>
+        {% endif %}
+        {% if page.organization %}
+          <li class="project-context-partner">
+            <span>
+              {{- strings.project.organization -}}
+              {%- if current_lang == 'zh-CN' %}：{% else %}: {% endif -%}
+            </span>
+            {{- page.organization }}
+          </li>
+        {% endif %}
+      </ul>
+    {% endif %}
+    {% unless page.summary == false or page.overview_in_facts %}
+      {% if page.summary or page.description %}
+        <p class="detail-summary">{{ page.summary | default: page.description }}</p>
+      {% endif %}
+    {% endunless %}
+    {% include project-facts.liquid %}
+    {% include project-links.liquid item=page %}
+  </header>
+  <article class="nano-prose">
+    {% if page.img %}
+      {% assign project_cover_alt = page.img_alt | default: page.title %}
+      <div class="detail-cover">
+        {% include figure.liquid path=page.img alt=project_cover_alt width=page.img_width height=page.img_height loading='eager' sizes='(max-width: 790px) calc(100vw - 30px), 760px' %}
+        {% if page.img_caption %}
+          <p class="caption">{{ page.img_caption }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+    {{ content }}
+  </article>
+  {% include project-related.liquid %}
+  {% if previous_project or next_project %}
+    <nav class="project-pagination" aria-label="{{ strings.nav.projects }}">
+      {% if previous_project -%}
+        <a class="project-previous" href="{{ previous_project.url | relative_url }}"
+          ><span>{{ strings.project.previous }}</span>{{ previous_project.title -}}
+        </a>
+      {%- endif %}
+      {% if next_project -%}
+        <a class="project-next" href="{{ next_project.url | relative_url }}"
+          ><span>{{ strings.project.next }}</span>{{ next_project.title -}}
+        </a>
+      {%- endif %}
+    </nav>
+  {% endif %}
+  <a class="project-bottom-return" data-project-return href="{{ return_url }}">{{ strings.content.back_projects }}</a>
+</div>

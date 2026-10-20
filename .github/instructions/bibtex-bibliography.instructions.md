@@ -1,13 +1,7 @@
-# BibTeX/Bibliography Instructions (v1.x)
+# Bibliography instructions
 
 Scope: `_bibliography/**`, `*.bib`
 
-## Guidance
-
-- Keep BibTeX entries valid and consistently formatted.
-- Preserve fields expected by citation/publication plugins.
-- Route citation runtime/parsing changes to owning plugin repos.
-
-## Validation
-
-Use the validated command set in `AGENTS.md`.
+Read [AGENTS.md](../../AGENTS.md) and the [content contract](../../docs/CONTENT_CONTRACT.md).
+Keep personal papers in `publications.bib`, preserve supplied titles, authors, status and journal metadata, and retain fields used by the publication template.
+Use the Docker checks in the [local guide](../../docs/LOCAL_DEVELOPMENT.md).

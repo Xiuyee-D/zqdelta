@@ -1,0 +1,16 @@
+{% assign language_posts = site.posts | where: 'lang', current_lang %}
+{% capture related_notes %}
+  {% for post_key in page.related_posts %}
+    {% assign related_post = language_posts | where: 'translation_key', post_key | first %}
+    {% if related_post %}<li><a href="{{ related_post.url | relative_url }}">{{ related_post.title }}</a></li>{% endif %}
+  {% endfor %}
+{% endcapture %}
+{% assign related_notes = related_notes | strip %}
+{% if related_notes != '' %}
+  <section class="project-related">
+    <h2>{{ strings.project.related_notes }}</h2>
+    <ul>
+      {{ related_notes }}
+    </ul>
+  </section>
+{% endif %}

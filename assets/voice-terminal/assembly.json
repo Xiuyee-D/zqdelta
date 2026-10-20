@@ -1,0 +1,110 @@
+{
+  "revision": "r4-limited-clip-no-led-leads",
+  "view_origin_mm": [-54, 30.5, 9.85],
+  "geometry_archive": "models/geometry.vtm",
+  "model_scope": {
+    "excluded_components": ["battery", "speaker", "tactile switches"],
+    "led_leads_removed": ["D1", "D5", "D6"]
+  },
+  "parts": [
+    {
+      "id": "front",
+      "mesh": "upper",
+      "rotation_matrix": [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ],
+      "translation_mm": [0, 0, 0],
+      "explode_offset_mm": [0, 0, 40],
+      "explode_stage": [0.12, 0.84],
+      "display_color": "#e7eae8"
+    },
+    {
+      "id": "rear",
+      "mesh": "lower",
+      "rotation_matrix": [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ],
+      "translation_mm": [1, 0, 0],
+      "explode_offset_mm": [0, 0, -23],
+      "explode_stage": [0, 0.6],
+      "display_color": "#dde2e0"
+    },
+    {
+      "id": "power",
+      "mesh": "button",
+      "rotation_matrix": [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ],
+      "translation_mm": [0, 0, 10.3],
+      "explode_offset_mm": [20, 0, 40],
+      "explode_stage": [0.2, 1],
+      "display_color": "#82918e"
+    },
+    {
+      "id": "wake",
+      "mesh": "button",
+      "rotation_matrix": [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ],
+      "translation_mm": [0, 11, 10.3],
+      "explode_offset_mm": [20, 0, 40],
+      "explode_stage": [0.2, 1],
+      "display_color": "#82918e"
+    },
+    {
+      "id": "plate",
+      "mesh": "plate",
+      "rotation_matrix": [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ],
+      "translation_mm": [0, 0, 9],
+      "explode_offset_mm": [10, 0, 20],
+      "explode_stage": [0.25, 0.95],
+      "display_color": "#b39b70"
+    },
+    {
+      "id": "pcb",
+      "mesh": "pcb",
+      "rotation_matrix": [
+        [0, -1, 0],
+        [1, 0, 0],
+        [0, 0, 1]
+      ],
+      "translation_mm": [-119, -88.75, 13.3],
+      "explode_offset_mm": [0, 0, -3],
+      "explode_stage": [0.18, 0.7],
+      "display_color": null
+    },
+    {
+      "id": "clip",
+      "mesh": "clip",
+      "rotation_matrix": [
+        [1, 0, 0],
+        [0, 0.9999862922474267, -0.00523596383141958],
+        [0, 0.00523596383141958, 0.9999862922474267]
+      ],
+      "translation_mm": [-0.29999999999999716, 2.1354320444810426, 5.773243073291512],
+      "explode_offset_mm": [0, 0, -23],
+      "explode_stage": [0, 0.6],
+      "display_color": "#7f8d88",
+      "closed_stop": {
+        "minimum_angle_deg": 0.3,
+        "maximum_angle_deg": 0.4,
+        "angle_deg": 0.3,
+        "pivot_assembly_mm": [-54.0, 45.45, 3.10435333521643],
+        "base_translation_mm": [-0.3, 2.15, 6.0]
+      },
+      "motion_group": "rear"
+    }
+  ]
+}

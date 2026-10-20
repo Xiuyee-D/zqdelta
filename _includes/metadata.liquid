@@ -1,0 +1,42 @@
+{% comment %}Site-owned metadata: localized pages and one shared Chinese blog body.{% endcomment %}
+{% capture author_name %}{{ site.first_name }}{% if site.middle_name %} {{ site.middle_name }}{% endif %} {{ site.last_name }}{% endcapture %}
+{% assign site_name = site.title %}
+{% if site_name == 'blank' or site_name == null or site_name == '' %}
+  {% assign site_name = author_name %}
+{% endif %}
+{% capture document_title %}{% if page.title and page.title != 'blank' and page.url != '/' %}{{ page.title }} | {% endif %}{{ site_name }}{% endcapture %}
+{% assign description = page.description | default: site.description %}
+{% assign current_lang = page.lang | default: site.lang %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ document_title | strip | escape }}</title>
+<meta name="author" content="{{ author_name | strip | escape }}">
+<meta name="description" content="{{ description | strip_html | strip | escape }}">
+{% assign keywords = page.keywords | default: site.keywords %}
+{% if keywords %}
+  <meta name="keywords" content="{{ keywords | escape }}">
+{% endif %}
+{% if page.noindex %}
+  <meta name="robots" content="noindex, follow">
+{% endif %}
+
+{% if site.serve_og_meta %}
+  <meta property="og:site_name" content="{{ site_name | strip | escape }}">
+  <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">
+  <meta property="og:title" content="{{ document_title | strip | escape }}">
+  <meta property="og:url" content="{{ page.url | replace: 'index.html', '' | absolute_url }}">
+  <meta property="og:description" content="{{ description | strip_html | strip | escape }}">
+  <meta property="og:locale" content="{% if current_lang == 'zh-CN' %}zh_CN{% else %}en_US{% endif %}">
+  {% assign preview_image = page.og_image | default: site.og_image %}
+  {% if preview_image %}
+    <meta property="og:image" content="{{ preview_image | absolute_url }}">
+    <meta property="og:image:alt" content="{{ author_name | strip | escape }}">
+  {% endif %}
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ document_title | strip | escape }}">
+  <meta name="twitter:description" content="{{ description | strip_html | strip | escape }}">
+  {% if preview_image %}
+    <meta name="twitter:image" content="{{ preview_image | absolute_url }}">
+  {% endif %}
+{% endif %}

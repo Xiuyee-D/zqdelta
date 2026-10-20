@@ -1,0 +1,6 @@
+{% assign ordered_projects = site.projects | where: 'lang', current_lang | sort: 'importance' %}
+{% assign ongoing_projects = ordered_projects | where: 'status', 'ongoing' %}
+{% assign remaining_projects = ordered_projects | where_exp: 'item', "item.status != 'ongoing'" %}
+{% assign dated_projects = remaining_projects | where_exp: 'item', 'item.sort_date != nil' | sort: 'sort_date' | reverse %}
+{% assign undated_projects = remaining_projects | where_exp: 'item', 'item.sort_date == nil' %}
+{% assign ordered_projects = ongoing_projects | concat: dated_projects | concat: undated_projects %}

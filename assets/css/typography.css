@@ -1,0 +1,140 @@
+:root {
+  --academic-font: "Academic Sans", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  --site-bg: #f6f8fb;
+  --site-surface: #ffffff;
+  --site-text: #3b4252;
+  --site-muted: #566176;
+  --site-border: #d8dee9;
+  --site-accent: #476b94;
+  --site-accent-hover: #365576;
+  --site-on-accent: #f8fafc;
+  --site-accent-soft: #e8eef5;
+  --site-heading-1: #9d4f5b;
+  --site-heading-2: #915b46;
+  --site-heading-3: #7b6531;
+  --site-strong: #2e3440;
+  --site-code-bg: #e9edf4;
+  --site-title-size: 1.75rem;
+  --site-section-size: 1.375rem;
+  --site-subsection-size: 1.125rem;
+  --site-card-title-size: 1.125rem;
+  --site-body-size: 1rem;
+  --site-body-leading: 1.8;
+  --site-header-height: 3.75rem;
+  --site-radius-container: 8px;
+  --site-radius-control: 4px;
+  --site-radius-pill: 999px;
+  --site-motion-feedback: 160ms;
+  --site-motion-navigation: 200ms;
+  --site-motion-theme: 240ms;
+  --site-motion-expand: 240ms;
+}
+
+@media (max-width: 575px) {
+  :root {
+    --site-title-size: 1.5rem;
+    --site-section-size: 1.25rem;
+    --site-subsection-size: 1.0625rem;
+    --site-card-title-size: 1.0625rem;
+    --site-header-height: 3.25rem;
+  }
+}
+
+/*
+ * Partial style(s) is(are) sourced or adapted from Blue Topaz
+ * (https://github.com/PKM-er/Blue-Topaz_Obsidian-css), and I would like to
+ * express my appreciation to WhyI (https://github.com/whyt-byte) and pkmer.cn
+ * (https://pkmer.cn). See BLUE_TOPAZ_LICENSE.txt.
+ * Palette: Topaz Nord. Light heading tones are darkened for readability.
+ */
+html[data-theme="dark"] {
+  --site-bg: #2e3440;
+  --site-surface: #343b49;
+  --site-text: #d8dee9;
+  --site-muted: #b4bfce;
+  --site-border: #4c566a;
+  --site-accent: #88c0d0;
+  --site-accent-hover: #acd3df;
+  --site-on-accent: #2e3440;
+  --site-accent-soft: #3b4d61;
+  --site-heading-1: #d38b96;
+  --site-heading-2: #d5917b;
+  --site-heading-3: #ebcb8b;
+  --site-strong: #eceff4;
+  --site-code-bg: #3b4252;
+}
+
+:root,
+html[data-theme="light"],
+html[data-theme="dark"] {
+  --global-bg-color: var(--site-bg);
+  --global-card-bg-color: var(--site-surface);
+  --global-text-color: var(--site-text);
+  --global-text-color-light: var(--site-muted);
+  --global-theme-color: var(--site-accent);
+  --global-hover-color: var(--site-accent-hover);
+  --global-hover-text-color: var(--site-on-accent);
+  --global-divider-color: var(--site-border);
+  --global-code-bg-color: var(--site-code-bg);
+  --global-footer-bg-color: var(--site-bg);
+  --global-footer-text-color: var(--site-muted);
+  --global-footer-link-color: var(--site-accent);
+}
+
+::selection {
+  background: var(--site-accent-soft);
+  color: var(--site-strong);
+}
+
+body {
+  font-family: var(--academic-font);
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+button {
+  font-family: var(--academic-font);
+}
+
+.post,
+.post-header,
+.navbar,
+footer {
+  font-family: var(--academic-font);
+}
+
+html[lang="zh-CN"] {
+  line-break: strict;
+}
+
+/* Use the font's proportional punctuation in English, including smart quotes. */
+html[lang="en"] body {
+  font-feature-settings: "pwid" 1;
+}
+
+/* Justify English prose without spreading headings or structured metadata. */
+html[lang="en"]
+  .site-content
+  :is(
+    .home-content p,
+    .home-content > ul > li,
+    .nano-card p,
+    .project-facts-overview dd,
+    .detail-header > p,
+    .nano-prose p:not(.caption),
+    .nano-prose li,
+    .post > article p:not(.caption),
+    .post > article li:not(.award-entry)
+  ):lang(en) {
+  text-align: justify;
+  text-align-last: start;
+  text-justify: inter-word;
+  hyphens: auto;
+}
