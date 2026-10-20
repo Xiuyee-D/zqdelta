@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>语音终端装配结构</title>
+    <script>
+      const options = new URLSearchParams(location.search);
+      document.documentElement.lang = options.get("lang") === "en" ? "en" : "zh-CN";
+      document.documentElement.dataset.theme = options.get("theme") === "dark" ? "dark" : "light";
+    </script>
+    <link rel="stylesheet" href="../fonts/academic-sans.css" />
+    <link rel="stylesheet" href="compact.css" />
+  </head>
+  <body>
+    <main class="vt-app">
+      <div class="vt-stage" id="stage">
+        <canvas id="canvas" tabindex="0" aria-label="语音终端三维模型；拖动或使用方向键旋转，Home 复位"></canvas>
+        <span class="vt-hint" id="hint">拖动旋转 · 方向键调整视角</span>
+        <div id="labels" aria-hidden="true"></div>
+        <p id="loading" class="vt-loading" role="status">正在加载模型…</p>
+      </div>
+      <div class="vt-toolbar" role="group" aria-label="装配视图">
+        <div class="vt-views">
+          <button type="button" id="assembled" aria-pressed="true" disabled>整机</button>
+          <button type="button" id="exploded" aria-pressed="false" disabled>展开</button>
+        </div>
+        <button type="button" id="reset" disabled>复位</button>
+      </div>
+    </main>
+    <script type="module" src="compact.js"></script>
+  </body>
+</html>
