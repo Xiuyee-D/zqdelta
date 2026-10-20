@@ -303,6 +303,22 @@ summary::-webkit-details-marker {
   line-height: 1.75;
 }
 
+:is(.project-card p, .blog-card-description):lang(en) {
+  -webkit-hyphenate-limit-before: 3;
+  -webkit-hyphenate-limit-after: 3;
+  hyphenate-limit-chars: 6 3 3;
+}
+
+/* A real last line keeps justification and the ellipsis consistent across engines. */
+.nano-card p[data-word-clamp] {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.nano-card .summary-ellipsis::before {
+  content: "…";
+}
+
 .project-card > .nano-arrow {
   grid-column: 2;
   grid-row: 1;

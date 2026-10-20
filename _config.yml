@@ -1,12 +1,14 @@
-# Personal site: see docs/LOCAL_DEVELOPMENT.md for the Docker workflow.
+# Personal site: see docs/MAINTENANCE.md.
 ---
 title: blank
 first_name: Ziqian
 middle_name:
 last_name: Deng
 lang: en
-icon: "⚛️"
-apple_touch_icon:
+icon: brand/monogram.svg
+icon_ico: brand/favicon.ico
+icon_png: brand/favicon-48.png
+apple_touch_icon: /assets/img/brand/apple-touch-icon.png
 url: https://Xiuyee-D.github.io
 baseurl: "/zqdelta"
 last_updated: false
@@ -18,9 +20,6 @@ al_folio:
     version: 4.1.18
     preflight: false
     css_entry: assets/tailwind/app.css
-  features:
-    cv:
-      enabled: true
   compat:
     bootstrap:
       enabled: false
@@ -43,8 +42,6 @@ og_image: /assets/img/dzq.png
 collections:
   projects:
     output: true
-  teachings:
-    output: false
 markdown: kramdown
 highlighter: rouge
 kramdown:
@@ -75,6 +72,7 @@ exclude:
   - ".claude/"
   - ".codex/"
   - ".dev-tools/"
+  - ".local/"
   - _site/
   - AGENTS.md
   - al-folio-upgrade-report.md
@@ -89,13 +87,9 @@ exclude:
   - package.json
   - package-lock.json
   - node_modules/
-  - _teachings/
   - README.md
   - test/
   - vendor
-  - assets/json/
-  - assets/rendercv/
-  - requirements.txt
 keep_files:
   - CNAME
   - ".nojekyll"
@@ -188,9 +182,8 @@ imagemagick:
   widths:
     - 480
     - 800
-    - 1400
   input_directories:
-    - assets/img/
+    - assets/img/projects/
   input_formats:
     - ".jpg"
     - ".jpeg"
@@ -222,7 +215,7 @@ third_party_libraries:
     integrity:
       js: sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=
     url:
-      js: https://cdn.jsdelivr.net/npm/vanilla-back-to-top@{{version}}/dist/vanilla-back-to-top.min.js
+      js: /assets/js/third-party/vanilla-back-to-top-7.2.1.min.js
     version: 7.2.1
 plugins:
   - jekyll-3rd-party-libraries
@@ -236,9 +229,7 @@ plugins:
   - jekyll-terser
   - jekyll-toc
   - al_folio_core
-  - al_folio_cv
   - al_folio_upgrade
-  - al_img_tools
   - al_math
   - al_rtl
 toc:

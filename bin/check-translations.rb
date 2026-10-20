@@ -20,7 +20,7 @@ def read_metadata(path)
   [data, contents, match]
 end
 
-page_sources = %w[about publications projects blog awards].map { |name| "_pages/#{name}-zh.md" }
+page_sources = %w[about projects blog awards].map { |name| "_pages/#{name}-zh.md" }
 page_sources |= Dir.glob('_pages/*-zh.md')
 pairs = page_sources.sort.map { |path| [path, path.sub('-zh.md', '.md')] }
 project_sources = Dir.glob('_projects/*.zh.md')

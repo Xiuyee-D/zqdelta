@@ -3,6 +3,7 @@ const playwright = require("@playwright/test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const checkSummaries = require("./summary_checks.cjs");
 const engine = process.argv[2];
 assert.ok(["firefox", "webkit"].includes(engine), "Choose firefox or webkit");
 const base = (process.env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta").replace(/\/$/, "");
@@ -285,6 +286,7 @@ async function viewer(browser) {
           for (const section of ["/", "/projects/", "/blog/", "/awards/"]) {
             await visit(page, `${base}${prefix}${section}`);
             const sample = await layout(page);
+            if (!prefix && ["/projects/", "/blog/"].includes(section)) await checkSummaries(page);
             if (!references.has(prefix)) references.set(prefix, sample.profile);
             const reference = references.get(prefix);
             for (const axis of ["x", "y", "width", "height"])

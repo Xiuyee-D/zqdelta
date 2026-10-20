@@ -4,15 +4,18 @@
   {% assign image_path = image_profile.profile.image | prepend: '/assets/img/' %}
   {% assign image_extension = image_path | split: '.' | last %}
   {% assign raster_extensions = 'png,jpg,jpeg,tiff,gif' | split: ',' %}
-  {% if site.imagemagick.enabled and raster_extensions contains image_extension %}
-    {% assign image_stem = image_path | remove: '.jpg' | remove: '.jpeg' | remove: '.png' | remove: '.tiff' | remove: '.gif' %}
-    {% capture image_srcset %}{% for width in site.imagemagick.widths %}{{ image_stem | relative_url }}-{{ width }}.webp {{ width }}w{% unless forloop.last %}, {% endunless %}{% endfor %}{% endcapture %}
+  {% assign image_srcset = '' %}
+  {% if raster_extensions contains image_extension %}
+    {% capture image_srcset %}{% include profile-image-srcset.liquid path=image_path %}{% endcapture %}
+  {% endif %}
+  {% if image_srcset != empty %}
+    {% assign image_preload_fallback = image_srcset | strip | split: ',' | first | strip | split: ' ' | first %}
     <link
       rel="preload"
       as="image"
-      href="{{ image_stem | relative_url }}-{{ site.imagemagick.widths.first }}.webp"
+      href="{{ image_preload_fallback }}"
       imagesrcset="{{ image_srcset | strip }}"
-      imagesizes="(min-width: 925px) 175px, 75px"
+      imagesizes="{{ site.data.profile_image.sizes | default: '(min-width: 925px) 175px, 75px' }}"
       type="image/webp"
       fetchpriority="high"
     >

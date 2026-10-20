@@ -1,0 +1,13 @@
+{%- assign profile_extension = include.path | split: '.' | last | downcase -%}
+{%- assign profile_raster_extensions = 'png,jpg,jpeg,tiff,gif' | split: ',' -%}
+{%- if site.data.profile_image.source == include.path -%}
+  {%- for image in site.data.profile_image.files -%}
+    {{- image.path | relative_url }}
+    {{ image.width }}w{% unless forloop.last %}, {% endunless -%}
+  {%- endfor -%}
+{%- elsif site.imagemagick.enabled and profile_raster_extensions contains profile_extension -%}
+  {%- assign profile_stem = include.path | remove: '.jpg' | remove: '.jpeg' | remove: '.png' | remove: '.tiff' | remove: '.gif' -%}
+  {%- for width in site.imagemagick.widths -%}
+    {{- profile_stem | relative_url }}-{{ width }}.webp {{ width }}w{% unless forloop.last %}, {% endunless -%}
+  {%- endfor -%}
+{%- endif -%}

@@ -24,17 +24,6 @@
       <link rel="preload" href="{{ site.data.fonts.common | relative_url }}" as="font" type="font/woff2" crossorigin>
     {% endif %}
     <link rel="stylesheet" href="{{ '/assets/fonts/academic-sans.css' | relative_url | bust_file_cache }}">
-    {% include critical-images.liquid %}
-    {% if page.redirect and page.layout != 'project' %}
-      {% if page.redirect == true %}
-        {% assign redirect = site.baseurl | append: '/' %}
-      {% elsif page.redirect contains '://' %}
-        {% assign redirect = page.redirect %}
-      {% else %}
-        {% assign redirect = page.redirect | relative_url %}
-      {% endif %}
-      <meta http-equiv="refresh" content="3; url={{ redirect }}">
-    {% endif %}
     {% include head.liquid %}
     <script src="{{ '/assets/js/site-theme.js' | relative_url | bust_file_cache }}"></script>
     <link rel="stylesheet" href="{{ '/assets/css/typography.css' | relative_url | bust_file_cache }}">

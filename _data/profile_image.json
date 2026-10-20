@@ -1,0 +1,27 @@
+{
+  "source": "/assets/img/dzq.png",
+  "source_sha256": "0d498d3479b0d1365a9e5f299cc837e02e8fda3f77299d84b969c9f3632c7961",
+  "sizes": "(min-width: 925px) 175px, 75px",
+  "files": [
+    {
+      "path": "/assets/img/profile/dzq-150-3303aee16832.webp",
+      "width": 150,
+      "bytes": 4746
+    },
+    {
+      "path": "/assets/img/profile/dzq-225-99b122043dc4.webp",
+      "width": 225,
+      "bytes": 10772
+    },
+    {
+      "path": "/assets/img/profile/dzq-350-6ad0fd4e30a2.webp",
+      "width": 350,
+      "bytes": 27956
+    },
+    {
+      "path": "/assets/img/profile/dzq-525-e15e5d79af4c.webp",
+      "width": 525,
+      "bytes": 67004
+    }
+  ]
+}

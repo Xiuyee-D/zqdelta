@@ -4,6 +4,8 @@
   const states = new WeakMap();
   const disclosureDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--site-motion-expand")) || 240;
 
+  // The local library is deferred before this script; initialize after parsing.
+  if (typeof addBackToTop === "function") addBackToTop();
   const backToTop = document.getElementById("back-to-top");
   if (backToTop) {
     backToTop.setAttribute("role", "button");

@@ -64,6 +64,21 @@ for (const key of ["latin", "common"])
     `Missing ${key} primary subset.`
   );
 requireCondition(!exists("assets/fonts/AcademicSans.woff2"), "Do not restore the monolithic font download.");
+const profileData = JSON.parse(read("_data/profile_image.json"));
+requireCondition(
+  crypto
+    .createHash("sha256")
+    .update(fs.readFileSync(profileData.source.slice(1)))
+    .digest("hex") === profileData.source_sha256,
+  "Avatar source changed: rebuild its derivatives with bin/build-profile-images.rb."
+);
+for (const image of profileData.files) {
+  const file = image.path.slice(1);
+  requireCondition(exists(file), `Missing avatar derivative: ${file}.`);
+  if (!exists(file)) continue;
+  const hash = crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").slice(0, 12);
+  requireCondition(file.endsWith(`-${image.width}-${hash}.webp`), `Avatar derivative hash does not match: ${file}.`);
+}
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exit(1);

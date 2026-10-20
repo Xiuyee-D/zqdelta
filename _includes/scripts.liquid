@@ -9,16 +9,19 @@
 {% if content contains '<pre' %}
   <script defer src="{{ '/assets/js/site-code.js' | relative_url | bust_file_cache }}"></script>
 {% endif %}
+{% if page.lang == 'en' %}
+  {% if page.translation_key == 'projects' or page.translation_key == 'blog' %}
+    <script defer src="{{ '/assets/js/site-summaries.js' | relative_url | bust_file_cache }}"></script>
+  {% endif %}
+{% endif %}
 {% if site.enable_progressbar %}
   <script defer src="{{ '/assets/js/progress-bar.js' | relative_url | bust_file_cache }}"></script>
 {% endif %}
 {% if site.back_to_top %}
   <script
-    src="{{ site.third_party_libraries['vanilla-back-to-top'].url.js }}"
+    defer
+    src="{{ site.third_party_libraries['vanilla-back-to-top'].url.js | relative_url | bust_file_cache }}"
     integrity="{{ site.third_party_libraries['vanilla-back-to-top'].integrity.js }}"
     crossorigin="anonymous"
   ></script>
-  <script>
-    addBackToTop();
-  </script>
 {% endif %}

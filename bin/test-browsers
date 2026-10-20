@@ -26,7 +26,7 @@ if [[ "$(uname -s)" != Linux ]]; then
     exit 1
 fi
 if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
-    echo 'Docker is required for isolated browser dependencies. See docs/LOCAL_DEVELOPMENT.md.' >&2
+    echo 'Docker is required for isolated browser dependencies. See docs/MAINTENANCE.md.' >&2
     exit 1
 fi
 BROWSER_IMAGE="zqdelta-browsers:$(cat Dockerfile.browser package-lock.json | sha256sum | cut -c1-12)"

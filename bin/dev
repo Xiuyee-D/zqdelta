@@ -30,7 +30,7 @@ HELP
 
 require_docker() {
     if ! command -v docker >/dev/null 2>&1; then
-        echo 'Missing Docker. See docs/LOCAL_DEVELOPMENT.md for installation instructions.' >&2
+        echo 'Missing Docker. See docs/MAINTENANCE.md for the required local tools.' >&2
         exit 1
     fi
     if ! docker info >/dev/null 2>&1; then

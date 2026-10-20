@@ -14,16 +14,10 @@ GEM
     al_folio_core (1.0.15)
       jekyll (>= 3.9, < 5.0)
       liquid (>= 4.0, < 6.0)
-    al_folio_cv (1.0.2)
-      jekyll (>= 3.9, < 5.0)
-      liquid (>= 4.0, < 6.0)
     al_folio_upgrade (1.0.3)
       al_folio_core (>= 1.0.0)
       jekyll (>= 3.9, < 5.0)
       liquid (>= 4.0, < 6.0)
-    al_img_tools (1.0.3)
-      jekyll (>= 3.9, < 5.0)
-      jekyll-3rd-party-libraries (~> 0.0.1)
     al_math (1.0.2)
       jekyll (>= 3.9, < 5.0)
       liquid (>= 4.0, < 6.0)
@@ -246,9 +240,7 @@ PLATFORMS
 
 DEPENDENCIES
   al_folio_core (= 1.0.15)
-  al_folio_cv (= 1.0.2)
   al_folio_upgrade (= 1.0.3)
-  al_img_tools (= 1.0.3)
   al_math (= 1.0.2)
   al_rtl (= 1.0.0)
   jekyll
@@ -268,9 +260,7 @@ DEPENDENCIES
 CHECKSUMS
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
   al_folio_core (1.0.15) sha256=eee5d0afefab5d3e8747b615890d760ed0ab01a1210991118709c4e969ad1326
-  al_folio_cv (1.0.2) sha256=d9b8d3624c0c707a04deaa41972fa88395fa164419bccc44e2dc2488400022fa
   al_folio_upgrade (1.0.3) sha256=434ffddb27705852eae0bcaa01a8d007e0ef65472a989d1a33ae759f910f4709
-  al_img_tools (1.0.3) sha256=c50dfa206bb4459925cbfc0e7d03b326e7cb1c282200d5d110b6595f4d661cf7
   al_math (1.0.2) sha256=c9fa6f3e343c0d35782d77fe386461ceff7d12186d9b51e6c92bb186b3d60781
   al_rtl (1.0.0) sha256=dffed3cb05acf0e4f96e7ee2d51cb05fc83a428e0d5e4d697c5da4b7c3fe0f0b
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b

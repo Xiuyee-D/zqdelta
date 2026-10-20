@@ -41,6 +41,7 @@ publication:
   journal_citation_reports: JCR
   impact_factor: IF
   status:
+    PREPARATION: Manuscript in preparation
     RRC: Required Reviews Completed
     UR: Under Review
 project:
@@ -76,4 +77,4 @@ project_kind:
   engineering: Engineering
   personal: Hobby
 translation_source: _data/i18n/zh-CN.yml
-translation_source_sha256: 2f6db4e5f2b236e222a5e3f1033342e85e4e394327634aef559d384543236dbb
+translation_source_sha256: 8235d4aea817157be7cb75ea2e5e72eb6ab089bf207a6131cc89d5dc8a14a86c

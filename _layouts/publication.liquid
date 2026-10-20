@@ -92,9 +92,13 @@
         <span class="publication-title-note">{{ strings.publication.provisional_title | default: '(provisional title)' }}</span>
       {%- endif -%}
       .
-      <em class="publication-journal">{{ entry.journal | default: entry.booktitle | default: entry.publisher }}</em>
-      {%- if entry.year %}, {{ entry.year }}{% endif -%}
-      .
+      {% if venue_name and venue_name != empty %}
+        <em class="publication-journal">{{ venue_name }}</em>
+        {%- if entry.year %}, {{ entry.year }}{% endif -%}
+        .
+      {% elsif entry.year %}
+        {{ entry.year }}.
+      {% endif %}
       {% if entry.jcr_quartile or entry.impact_factor %}
         <span class="publication-metadata"
           >(<span class="publication-metrics">

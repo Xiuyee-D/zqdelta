@@ -20,7 +20,7 @@ announcements:
 latest_posts:
   enabled: false
 translation_source: _pages/about-zh.md
-translation_source_sha256: dd67aa410d6f6efb152f6ca94ada2716683e79bbf2a3afab9f17e27cb8103aa4
+translation_source_sha256: 7e3a59e828a070f2438212f67e5c0a376f41a1760e418b7668b4808a4d6bb687
 ---
 
 <div id="about-me" class="about-biography" markdown="1">
@@ -44,6 +44,6 @@ My research interests include:
 
 ## <span class="section-icon" aria-hidden="true">📖</span> Education {#educations}
 
-Master's degree in Control Science and Engineering, Beijing Technology and Business University, Beijing, China, Sep 2024 – present
+M.Eng. in Control Science and Engineering, Beijing Technology and Business University, Beijing, China, Sep 2024 – Jun 2027 (expected)
 
 B.Eng. in Information Engineering, Beijing Technology and Business University, Beijing, China, Sep 2019 – Jun 2023

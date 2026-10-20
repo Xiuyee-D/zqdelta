@@ -19,9 +19,7 @@ end
 
 group :al_folio_plugins do
   gem 'al_folio_core', '= 1.0.15'
-  gem 'al_folio_cv', '= 1.0.2'
   gem 'al_folio_upgrade', '= 1.0.3'
-  gem 'al_img_tools', '= 1.0.3'
   gem 'al_math', '= 1.0.2'
   gem 'al_rtl', '= 1.0.0'
 end

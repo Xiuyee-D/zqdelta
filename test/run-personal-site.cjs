@@ -26,7 +26,7 @@ function run(command, args) {
 (async () => {
   if (["--all", "--integration"].includes(mode)) run("./bin/dev", ["bundle", "exec", "ruby", "test/personal_site_test.rb"]);
   if (!["--integration", "--compatibility"].includes(mode)) {
-    if (!run("./bin/dev", ["start"])) process.exit(1);
+    if (!env.PERSONAL_SITE_URL && !run("./bin/dev", ["start"])) process.exit(1);
     const url = `${env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta"}/`;
     const deadline = Date.now() + 120000;
     let ready = false;

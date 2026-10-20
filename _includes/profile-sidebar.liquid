@@ -6,11 +6,29 @@
 {% assign full_name = author_page.profile.name | default: full_name %}
 <aside class="about-profile" aria-label="{{ strings.nav.about }}">
   {% if author_page.profile.image %}
-    {% assign profile_image_path = author_page.profile.image | prepend: 'assets/img/' %}
-    {%
-      include figure.liquid loading="eager" path=profile_image_path class="about-avatar" sizes="(min-width: 925px) 175px, 75px" alt=full_name
-      cache_bust=true
-    %}
+    {% assign profile_image_path = author_page.profile.image | prepend: '/assets/img/' %}
+    {% capture profile_srcset %}{% include profile-image-srcset.liquid path=profile_image_path %}{% endcapture %}
+    <figure>
+      <picture>
+        {% if profile_srcset != empty %}
+          <source
+            srcset="{{ profile_srcset }}"
+            sizes="{{ site.data.profile_image.sizes | default: '(min-width: 925px) 175px, 75px' }}"
+            type="image/webp"
+          >
+        {% endif %}
+        <img
+          src="{{ profile_image_path | relative_url | bust_file_cache }}"
+          class="about-avatar"
+          width="175"
+          height="175"
+          alt="{{ full_name | escape }}"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        >
+      </picture>
+    </figure>
   {% endif %}
   <div class="about-profile-details">
     <p class="about-name">

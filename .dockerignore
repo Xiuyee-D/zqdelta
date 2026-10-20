@@ -9,3 +9,8 @@ vendor/
 output/
 test-results/
 .dev-tools/
+.local/
+.agents/
+.claude/
+.codex/
+.gemini/

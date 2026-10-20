@@ -20,7 +20,7 @@ try:
     from fontTools.ttLib import TTFont
     import brotli  # required for WOFF2 compression
 except ImportError:
-    sys.exit('Optional font rebuild needs fonttools and brotli. See docs/LOCAL_DEVELOPMENT.md for a project-local venv; preview needs neither.')
+    sys.exit('Optional font rebuild needs fonttools and brotli. See docs/MAINTENANCE.md; preview needs neither.')
 
 CACHE.mkdir(parents=True, exist_ok=True)
 OUTPUT.mkdir(parents=True, exist_ok=True)

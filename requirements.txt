@@ -1,2 +1,0 @@
-# Optional PDF CV generation only; install in a project-local virtual environment.
-rendercv[full]

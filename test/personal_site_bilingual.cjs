@@ -3,6 +3,7 @@ const { chromium } = require("@playwright/test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const checkSummaries = require("./summary_checks.cjs");
 
 const base = process.env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta";
 const han = /[\u3400-\u9fff]/;
@@ -85,6 +86,7 @@ async function fits(page) {
         for (const route of ["/", "/awards/", "/projects/", "/blog/", "/blog/affective-computing-03-theories/"]) {
           await ready(page, `${base}${route}`);
           await fits(page);
+          if (route === "/projects/" || route === "/blog/") await checkSummaries(page);
           assert.equal(await page.locator("html").getAttribute("data-theme"), colorScheme);
           assert.ok(!han.test(await page.locator(".about-profile").innerText()));
           assert.ok(await page.locator("[data-language-switch]").count());
@@ -98,7 +100,10 @@ async function fits(page) {
                 .evaluate((element) => getComputedStyle(element).textAlign),
               "justify"
             );
-            assert.ok((await page.locator(".home-content").innerText()).includes("Sep 2024 – present"));
+            assert.ok((await page.locator(".home-content").innerText()).includes("Sep 2024 – Jun 2027 (expected)"));
+            const draft = page.locator("#publication-deng2026milk_aroma");
+            assert.equal(await draft.locator(".publication-status").innerText(), "Manuscript in preparation");
+            assert.equal(await draft.locator(".publication-journal, .publication-metadata").count(), 0);
           }
           if (route === "/awards/") {
             assert.equal(await page.locator(".award-entry").count(), 12);
@@ -141,6 +146,14 @@ async function fits(page) {
       }
     }
     console.log("Passed English About, Awards, Projects, Blog and a long course title at 375/768/1440px in both themes.");
+    await ready(page, `${base}/blog/`);
+    for (const width of [320, 375, 768, 1440, 375]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      await checkSummaries(page);
+      await fits(page);
+    }
+    console.log("English summaries preserve full source text, word boundaries and line limits after responsive resizing.");
     const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 375, height: 900 } });
     try {
       const native = await context.newPage();

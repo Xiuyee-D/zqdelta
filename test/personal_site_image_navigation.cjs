@@ -87,6 +87,42 @@ function checkPrepared(probe, label) {
   const browser = await chromium.launch({ ignoreDefaultArgs: ["--hide-scrollbars"], args: ["--disable-features=OverlayScrollbar"] });
   const errors = [];
   try {
+    // Fresh profiles verify actual candidate selection and matching preload use.
+    for (const [width, deviceScaleFactor, maximum] of [
+      [375, 1, 150],
+      [375, 2, 150],
+      [375, 3, 225],
+      [1440, 1, 225],
+      [1440, 2, 350],
+    ]) {
+      policy = {};
+      const avatarPage = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor, isMobile: width < 576 });
+      await avatarPage.goto(`${base}/zh/projects/`, { waitUntil: "load" });
+      const sample = await avatarPage.locator(".about-avatar").evaluate(async (image) => {
+        await image.decode();
+        const source = image.parentElement.querySelector("source");
+        const preload = document.querySelector('link[rel="preload"][as="image"]');
+        return {
+          src: image.currentSrc,
+          srcset: source.srcset.replace(/\s+/g, " ").trim(),
+          preload: preload.imageSrcset.replace(/\s+/g, " ").trim(),
+          sizes: [source.sizes, preload.imageSizes],
+          viewportFirst: !!(document.querySelector('meta[name="viewport"]').compareDocumentPosition(preload) & Node.DOCUMENT_POSITION_FOLLOWING),
+          requests: performance
+            .getEntriesByType("resource")
+            .filter((entry) => /\/assets\/img\/(?:profile\/)?dzq/.test(entry.name))
+            .map((entry) => entry.name),
+        };
+      });
+      assert.equal(sample.srcset, sample.preload, "Avatar preload and picture must use identical candidates");
+      assert.equal(sample.sizes[0], sample.sizes[1]);
+      assert.ok(sample.viewportFirst, "Declare the mobile viewport before choosing responsive image preloads");
+      const candidate = Number(sample.src.match(/dzq-(\d+)-[a-f0-9]+\.webp/)[1]);
+      assert.ok(candidate <= maximum, `Oversized avatar for ${width}px at DPR ${deviceScaleFactor}`);
+      assert.deepEqual(sample.requests, [sample.src], "Do not fetch duplicate or original avatar files");
+      await avatarPage.close();
+    }
+    console.log("Avatar selection passed five viewport/density combinations with one matching preload request each.");
     for (const width of [375, 1440]) {
       for (const theme of ["light", "dark"]) {
         policy = {};
@@ -140,13 +176,18 @@ function checkPrepared(probe, label) {
           fs.writeFileSync(path.join(output, `avatar-old-${width}-${theme}.png`), PNG.sync.write(oldAvatar));
           fs.writeFileSync(path.join(output, `avatar-retained-${width}-${theme}.png`), PNG.sync.write(retained));
         }
-        // A captured layer can round a few color channels by one byte. Keep a
-        // negligible tolerance, while rejecting a blank or altered portrait.
+        // Native snapshot compositing can round color channels by one byte.
+        // Reject any larger difference, including a blank or shifted portrait.
         // The compact profile can be covered by the source page's mobile menu.
         if (width >= 925) {
           assert.equal(retained.data.length, oldAvatar.data.length);
-          const error = retained.data.reduce((sum, value, index) => sum + Math.abs(value - oldAvatar.data[index]), 0);
-          assert.ok(error / retained.data.length < 0.1, "The old avatar must remain painted while covers load");
+          let maximum = 0;
+          const error = retained.data.reduce((sum, value, index) => {
+            const difference = Math.abs(value - oldAvatar.data[index]);
+            maximum = Math.max(maximum, difference);
+            return sum + difference;
+          }, 0);
+          assert.ok(maximum <= 1, `The old avatar must remain painted while covers load (maximum ${maximum}, mean ${error / retained.data.length})`);
         }
         await settle(page);
         checkPrepared(await page.evaluate(() => window.imageNavigationProbe), `${width}px ${theme} covers`);

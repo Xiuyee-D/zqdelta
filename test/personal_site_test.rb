@@ -60,7 +60,7 @@ end
 
 Dir.mktmpdir('zqdelta-content-') do |source|
   Dir.children(root).each do |name|
-    next if %w[.git .dev-tools _site _posts _projects _includes _bibliography assets node_modules vendor].include?(name)
+    next if %w[.git .dev-tools .local _site _posts _projects _includes _bibliography assets node_modules vendor].include?(name)
     File.symlink(File.join(root, name), File.join(source, name))
   end
   FileUtils.cp_r(File.join(root, '_bibliography'), source)
@@ -122,6 +122,12 @@ Dir.mktmpdir('zqdelta-content-') do |source|
         journal = {Review Test Journal},
         year = {2026},
         submission_status = {UR}
+      }
+      @unpublished{draft-fixture,
+        title = {Draft paper fixture},
+        author = {Example, Alice},
+        year = {2026},
+        submission_status = {PREPARATION}
       }
       @article{accepted-fixture,
         title = {Accepted paper fixture},
@@ -277,6 +283,10 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(document.css('.about-contact-links a').length == 3, "Wrong contact count: #{path}")
     assert(document.css('#search-toggle, ninja-keys, #bibsearch, #localized-search-data').empty?, "Search present: #{path}")
     assert(document.css('script[src*="search"]').empty?, "Search scripts present: #{path}")
+    back_script = document.at_css('script[src*="vanilla-back-to-top"]')
+    assert(back_script && back_script.key?('defer') && back_script['src'].start_with?('/zqdelta/assets/js/third-party/'), 'Back-to-top must load locally without blocking parsing')
+    local_script = File.join(destination, back_script['src'].split('?').first.delete_prefix('/zqdelta/'))
+    assert(back_script['integrity'] == "sha256-#{[Digest::SHA256.file(local_script).digest].pack('m0')}", 'The published vendor script must retain its verified integrity')
     assert(!document.text.match?(/分钟阅读|min read/), "Reading time must not be published: #{path}")
     next if path == File.join(destination, '404.html') # One bilingual utility page, checked above.
     alternate = document.at_css('[data-language-switch]')
@@ -296,7 +306,7 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(home.at_css('meta[property="og:locale"]')['content'] == (prefix.empty? ? 'en_US' : 'zh_CN'), 'Sharing metadata must use the page language')
     assert(home.at_css('meta[property="og:image"]')['content'] == 'https://xiuyee-d.github.io/zqdelta/assets/img/dzq.png', 'Sharing previews must use the supplied avatar at the production URL')
     assert(home.css('.home-content > h2').map { |h| h['id'] } == %w[news publications educations], 'Home section order changed')
-    assert(home.css('.publication-entry').length == 4, 'Publication fixtures did not render')
+    assert(home.css('.publication-entry').length == 5, 'Publication fixtures did not render')
     paper = home.at_css('#publication-layout-fixture')
     assert(paper.at_css('.publication-authors').text.gsub(/\s+/, ' ').strip == 'Example, A. A., Example, J.-L.', 'Use surnames before initials, preserving compound given names')
     assert(paper.at_css('.publication-journal').text == 'Test Venue', 'Paper journal missing')
@@ -323,6 +333,10 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(review.at_css('.publication-authors').nil?, 'Omit unsupplied authors')
     assert(review.at_css('.publication-visual').nil? && !review['class'].include?('has-preview'), 'Text-only citations must not reserve a visual column')
     assert(review.at_css('.publication-metadata').nil?, 'Status-only entries must not leave empty metric brackets')
+    draft = home.at_css('#publication-draft-fixture')
+    assert(draft.at_css('.publication-status').text == (prefix.empty? ? 'Manuscript in preparation' : '初稿完成'), 'Localize the unsubmitted manuscript status')
+    assert(draft.at_css('.publication-journal').nil? && draft.at_css('.publication-metadata').nil?, 'Unsubmitted drafts must not imply a journal or journal metrics')
+    assert(draft.at_css('.publication-citation').text.gsub(/\s+/, ' ').strip == 'Example, A. Draft paper fixture. 2026.', 'Omit missing venues without leaving a stray comma or period')
     accepted = home.at_css('#publication-accepted-fixture')
     assert(accepted.at_css('.publication-venue').text == 'Food Chem.: X', 'Accepted status must preserve the standard journal abbreviation and its punctuation')
     assert(accepted.at_css('.publication-venue')['title'] == 'Food Chemistry: X', 'Accepted badge must retain the full journal name as a tooltip')
