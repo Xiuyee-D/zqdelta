@@ -1,0 +1,1 @@
+(()=>{const t=new URL(".",document.getElementById("MathJax-script").src).href.replace(/\/$/,"");MathJax.loader={paths:{mathjax:t,sre:`${t}/sre/mathmaps`},pathFilters:[[a=>(a.name.startsWith(`${t}/`)&&a.name.endsWith(".js")&&!a.name.endsWith(".min.js")&&(a.name=a.name.replace(/\.js$/,".min.js")),!0),30]]},MathJax.chtml={fontURL:`${t}/output/chtml/fonts/woff-v2`}})();
