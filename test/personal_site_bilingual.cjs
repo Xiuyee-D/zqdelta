@@ -101,9 +101,20 @@ async function fits(page) {
               "justify"
             );
             assert.ok((await page.locator(".home-content").innerText()).includes("Sep 2024 – Jun 2027 (expected)"));
-            const draft = page.locator("#publication-deng2026milk_aroma");
-            assert.equal(await draft.locator(".publication-status").innerText(), "Manuscript in preparation");
-            assert.equal(await draft.locator(".publication-journal, .publication-metadata").count(), 0);
+            assert.deepEqual(await page.locator(".publication-entry").evaluateAll((entries) => entries.map((entry) => entry.id)), [
+              "publication-deng2026spkr",
+              "publication-deng2026dpsr",
+            ]);
+            for (const [key, journal, authors] of [
+              ["deng2026spkr", "Current Research in Food Science", "Deng, Z., Duan, Y., Lian, X., et al."],
+              ["deng2026dpsr", "Expert Systems with Applications", "Deng, Z., Lian, X., Gao, C., et al."],
+            ]) {
+              const paper = page.locator(`#publication-${key}`);
+              assert.equal(await paper.locator(".publication-visual .publication-status").innerText(), "With Editor");
+              assert.equal(await paper.locator(".publication-journal").innerText(), journal);
+              assert.equal(await paper.locator(".publication-metadata").count(), 0, "Submission-stage papers hide journal metrics");
+              assert.equal((await paper.locator(".publication-authors").innerText()).replace(/\s+/g, " ").trim(), authors);
+            }
           }
           if (route === "/awards/") {
             assert.equal(await page.locator(".award-entry").count(), 12);

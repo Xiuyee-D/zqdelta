@@ -30,6 +30,8 @@ Projects sort ongoing first (`status: ongoing`, no `sort_date`), then by complet
 
 Every page uses the localized about profile; contacts are email, LinkedIn and ORCID. Home order: biography, News, Publications, Education; retain `#educations`. The bilingual 404 links to both homepages, without redirects or search indexing.
 
+Submission-stage papers show their status without JCR/IF. Retain supplied metrics in BibTeX; they can be displayed after acceptance or publication.
+
 ## Presentation
 
 - Academic Sans / Topaz Nord; body 16px/1.8, H1–H4 28/22/18/16px with narrow-screen adjustments. English prose is justified; Chinese and structured metadata retain their alignment.
@@ -40,6 +42,8 @@ Every page uses the localized about profile; contacts are email, LinkedIn and OR
 ## Static assets
 
 Fonts, avatar derivatives and brand icons are committed; normal builds do not regenerate them. Preserve font coverage, weights 100–900 and manifests; see [font notes](../assets/fonts/README.md) and [brand notes](../assets/img/brand/README.md). Keep vendor bytes, SRI and licenses.
+
+MathJax is served locally and loaded only on formula pages. Preserve its extensions, fonts, accessibility resources and integrity manifest; see [browser dependencies](../assets/js/third-party/README.md). The build excludes vendor data from further minification.
 
 Automatic WebPs are limited to project illustrations at 480/800px for homepage paper previews. Extend `imagemagick` inputs/sizes when adding responsive image uses.
 

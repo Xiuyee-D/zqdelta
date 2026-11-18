@@ -21,6 +21,7 @@ const types = {
   ".webp": "image/webp",
   ".gif": "image/gif",
   ".woff2": "font/woff2",
+  ".woff": "font/woff",
   ".pdf": "application/pdf",
   ".xml": "application/xml",
 };

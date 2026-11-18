@@ -120,6 +120,7 @@ jekyll-minifier:
   compress_css: false
   exclude:
     - robots.txt
+    - assets/js/third-party/mathjax-3.2.2/**
 terser:
   compress:
     drop_console: true
@@ -205,11 +206,8 @@ third_party_libraries:
   mathjax:
     integrity:
       js: sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=
-    local:
-      fonts: output/chtml/fonts/woff-v2/
     url:
-      fonts: https://cdn.jsdelivr.net/npm/mathjax@{{version}}/es5/output/chtml/fonts/woff-v2/
-      js: https://cdn.jsdelivr.net/npm/mathjax@{{version}}/es5/tex-mml-chtml.js
+      js: /assets/js/third-party/mathjax-3.2.2/tex-mml-chtml.min.js
     version: 3.2.2
   vanilla-back-to-top:
     integrity:

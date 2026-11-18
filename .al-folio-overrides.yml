@@ -41,8 +41,8 @@ overrides:
     gem_version: 1.0.15
     upstream_path: _includes/scripts.liquid
     upstream_sha256: dbb92b179ff48952669a752a88053ed3981b3613393dd45d26291324253e661f
-    local_sha256: 2fe005b432c273aabed0146f0b4f6fef9809882db2fbd0a0ece59ff7b5a427d9
-    acknowledged_at: "2026-10-20"
+    local_sha256: 17341ad395f5a8395cfa0a4a12c10d25f396db25a117e7eef7fb0ace1491ffd0
+    acknowledged_at: "2026-11-18"
   _layouts/about.liquid:
     owner: al_folio_core
     gem_version: 1.0.15

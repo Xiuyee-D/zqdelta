@@ -294,35 +294,45 @@ async function stressContent(page) {
               ]);
               const slug = project.href.split("/").filter(Boolean).at(-1);
               if (slug === "multimodal-sentiment-analysis") {
-                const diagram = page.locator(".nano-prose figure img");
+                const diagram = page.locator('.nano-prose figure img[src$="/dpsr-architecture.png"]');
                 await diagram.scrollIntoViewIfNeeded();
                 await diagram.evaluate((image) => image.decode());
                 assert.deepEqual(await diagram.evaluate((image) => ({ width: image.naturalWidth, height: image.naturalHeight })), {
-                  width: 2400,
-                  height: 1302,
+                  width: 1960,
+                  height: 1064,
                 });
                 const bounds = await diagram.boundingBox();
-                assert.ok(Math.abs(bounds.width / bounds.height - 2400 / 1302) < 0.01, "TARF architecture must preserve its aspect ratio");
-                assert.equal(await page.locator(".nano-prose figure a").count(), 0, "TARF architecture must display inline");
+                assert.ok(Math.abs(bounds.width / bounds.height - 1960 / 1064) < 0.01, "DPSR architecture must preserve its aspect ratio");
+                assert.equal(await page.locator(".nano-prose figure a").count(), 0, "DPSR architecture must display inline");
                 await noOverflow(page);
               }
               if (slug === "olfactory-flavor-perception") {
-                const diagram = page.locator(".nano-prose figure img");
-                await diagram.scrollIntoViewIfNeeded();
-                await diagram.evaluate((image) => image.decode());
-                const dimensions = await diagram.evaluate((image) => ({ width: image.naturalWidth, height: image.naturalHeight }));
-                assert.deepEqual(dimensions, { width: 2400, height: 1350 });
+                assert.equal(await page.locator(".nano-prose figure img").count(), 2);
+                for (const [filename, width, height] of [
+                  ["olfactory-system-architecture.png", 2026, 1176],
+                  ["spkr-method.png", 1880, 996],
+                ]) {
+                  const diagram = page.locator(`.nano-prose figure img[src$="/${filename}"]`);
+                  await diagram.scrollIntoViewIfNeeded();
+                  await diagram.evaluate((image) => image.decode());
+                  const dimensions = await diagram.evaluate((image) => ({ width: image.naturalWidth, height: image.naturalHeight }));
+                  assert.deepEqual(dimensions, { width, height });
+                  const bounds = await diagram.boundingBox();
+                  assert.ok(Math.abs(bounds.width / bounds.height - width / height) < 0.01, "Keep each original figure's aspect ratio");
+                  const currentUrl = page.url();
+                  const openPages = page.context().pages().length;
+                  await diagram.click();
+                  assert.equal(page.url(), currentUrl, "Clicking the diagram must stay on the detail page");
+                  assert.equal(page.context().pages().length, openPages, "Clicking the diagram must not open a tab");
+                }
                 const text = await page.locator(".nano-prose").textContent();
-                for (const count of locale === "/zh" ? ["30 名受试者", "908 个事件"] : ["30 participants", "908 events"])
+                for (const count of locale === "/zh"
+                  ? ["30 名受试者", "908 个有效事件", "454 对"]
+                  : ["30 participants", "908 valid events", "454 paired records"])
                   assert.ok(text.includes(count), "The current localized dataset scope must remain visible");
                 assert.ok(!/1,978|1978|49 名|62 个|49 unique|62 acquisition|Windows/.test(text), "Prose must show only the dataset actually used");
                 assert.equal(await page.locator(".nano-prose figure a").count(), 0, "Architecture image must have no link");
-                assert.ok(!(await page.locator(".nano-prose figcaption").innerText()).includes("点击图片"));
-                const currentUrl = page.url();
-                const openPages = page.context().pages().length;
-                await diagram.click();
-                assert.equal(page.url(), currentUrl, "Clicking the diagram must stay on the detail page");
-                assert.equal(page.context().pages().length, openPages, "Clicking the diagram must not open a tab");
+                assert.ok((await page.locator(".nano-prose figcaption").allTextContents()).every((caption) => !caption.includes("点击图片")));
               }
               await screenshot(page, `${slug}-${label}`);
             }

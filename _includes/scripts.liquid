@@ -2,7 +2,15 @@
 {% comment %}Kramdown emits these delimiters from the shared Markdown; no duplicated math flags per language.{% endcomment %}
 {% if site.enable_math and site.plugins contains 'al_math' %}
   {% if content contains '\(' or content contains '\[' %}
-    {% include plugins/al_math_scripts.liquid %}
+    <script defer src="{{ '/assets/al_math/js/mathjax-setup.js' | relative_url }}"></script>
+    <script defer src="{{ '/assets/js/site-math.js' | relative_url | bust_file_cache }}"></script>
+    <script
+      defer
+      id="MathJax-script"
+      src="{{ site.third_party_libraries.mathjax.url.js | relative_url }}"
+      integrity="{{ site.third_party_libraries.mathjax.integrity.js }}"
+      crossorigin="anonymous"
+    ></script>
   {% endif %}
 {% endif %}
 <script src="{{ '/assets/js/no_defer.js' | relative_url | bust_file_cache }}"></script>

@@ -99,23 +99,25 @@
       {% elsif entry.year %}
         {{ entry.year }}.
       {% endif %}
-      {% if entry.jcr_quartile or entry.impact_factor %}
-        <span class="publication-metadata"
-          >(<span class="publication-metrics">
-            {%- if entry.jcr_quartile -%}
-              {{- strings.publication.journal_citation_reports | default: 'JCR' -}}
-              :
-              {{- entry.jcr_quartile -}}
-            {%- endif -%}
-            {%- if entry.jcr_quartile and entry.impact_factor %}; {% endif -%}
-            {%- if entry.impact_factor -%}
-              {{- strings.publication.impact_factor | default: 'IF' -}}
-              :
-              {{- entry.impact_factor -}}
-            {%- endif -%}</span
-          >)</span
-        >
-      {% endif %}
+      {% unless badge_kind == 'status' %}
+        {% if entry.jcr_quartile or entry.impact_factor %}
+          <span class="publication-metadata"
+            >(<span class="publication-metrics">
+              {%- if entry.jcr_quartile -%}
+                {{- strings.publication.journal_citation_reports | default: 'JCR' -}}
+                :
+                {{- entry.jcr_quartile -}}
+              {%- endif -%}
+              {%- if entry.jcr_quartile and entry.impact_factor %}; {% endif -%}
+              {%- if entry.impact_factor -%}
+                {{- strings.publication.impact_factor | default: 'IF' -}}
+                :
+                {{- entry.impact_factor -}}
+              {%- endif -%}</span
+            >)</span
+          >
+        {% endif %}
+      {% endunless %}
     </p>
     {% if entry.pdf or entry.code or entry.website %}
       <div class="publication-links">

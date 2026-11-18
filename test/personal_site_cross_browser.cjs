@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const checkSummaries = require("./summary_checks.cjs");
+const checkLocalMath = require("./math_checks.cjs");
 const engine = process.argv[2];
 assert.ok(["firefox", "webkit"].includes(engine), "Choose firefox or webkit");
 const base = (process.env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta").replace(/\/$/, "");
@@ -241,6 +242,7 @@ async function viewer(browser) {
   const browser = await playwright[engine].launch({ headless: process.env.PERSONAL_SITE_HEADED !== "1", env: browserEnv, proxy });
   report.version = browser.version();
   try {
+    await checkLocalMath(browser, base);
     const audit = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: "light" });
     const page = await audit.newPage();
     observe(page);

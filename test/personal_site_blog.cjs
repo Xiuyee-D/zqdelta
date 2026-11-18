@@ -3,6 +3,7 @@ const { chromium } = require("@playwright/test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const checkLocalMath = require("./math_checks.cjs");
 const base = process.env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta";
 const output = path.join(process.cwd(), ".dev-tools/test-results/blog");
 
@@ -115,6 +116,7 @@ async function backToTopFeedback(page, activation = "click") {
   const errors = [];
   const resources = new Set();
   try {
+    await checkLocalMath(browser, base);
     const audit = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     try {
       const page = await audit.newPage();

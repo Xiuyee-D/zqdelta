@@ -5,6 +5,7 @@ require 'tmpdir'
 require 'fileutils'
 require 'nokogiri'
 require 'digest'
+require 'json'
 
 root = File.expand_path('..', __dir__)
 destination = File.join(root, '.dev-tools', 'personal-site-test-output')
@@ -123,6 +124,12 @@ Dir.mktmpdir('zqdelta-content-') do |source|
         year = {2026},
         submission_status = {UR}
       }
+      @unpublished{editor-fixture,
+        title = {Editor handling fixture},
+        journal = {Editor Test Journal},
+        year = {2026},
+        submission_status = {WITH_EDITOR}
+      }
       @unpublished{draft-fixture,
         title = {Draft paper fixture},
         author = {Example, Alice},
@@ -134,7 +141,10 @@ Dir.mktmpdir('zqdelta-content-') do |source|
         journal = {Food Chemistry: X},
         abbr = {Food Chem.: X},
         year = {2026},
-        submission_status = {accepted}
+        submission_status = {accepted},
+        jcr_quartile = {Q1},
+        impact_factor = {1.2},
+        metrics_year = {2024}
       }
     BIB
   end
@@ -244,6 +254,15 @@ Dir.mktmpdir('zqdelta-content-') do |source|
   site = Jekyll::Site.new(configuration)
   site.process
 
+  math_assets = 'assets/js/third-party/mathjax-3.2.2'
+  math_manifest = JSON.parse(File.read(File.join(root, math_assets, 'manifest.json')))
+  math_manifest.fetch('files').each do |entry|
+    [root, destination].each do |directory|
+      asset = File.join(directory, math_assets, entry.fetch('path'))
+      assert(File.file?(asset) && Digest::SHA256.file(asset).hexdigest == entry.fetch('sha256'), "MathJax vendor bytes changed: #{asset}")
+    end
+  end
+
   assert(File.file?(File.join(destination, '.nojekyll')), 'Publish the prebuilt site with .nojekyll so Pages skips a second Jekyll build')
   not_found = Nokogiri::HTML(File.read(File.join(destination, '404.html')))
   assert(not_found.at_css('meta[name="robots"]')['content'] == 'noindex, follow', 'Keep the utility 404 out of search results')
@@ -306,7 +325,7 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(home.at_css('meta[property="og:locale"]')['content'] == (prefix.empty? ? 'en_US' : 'zh_CN'), 'Sharing metadata must use the page language')
     assert(home.at_css('meta[property="og:image"]')['content'] == 'https://xiuyee-d.github.io/zqdelta/assets/img/dzq.png', 'Sharing previews must use the supplied avatar at the production URL')
     assert(home.css('.home-content > h2').map { |h| h['id'] } == %w[news publications educations], 'Home section order changed')
-    assert(home.css('.publication-entry').length == 5, 'Publication fixtures did not render')
+    assert(home.css('.publication-entry').length == 6, 'Publication fixtures did not render')
     paper = home.at_css('#publication-layout-fixture')
     assert(paper.at_css('.publication-authors').text.gsub(/\s+/, ' ').strip == 'Example, A. A., Example, J.-L.', 'Use surnames before initials, preserving compound given names')
     assert(paper.at_css('.publication-journal').text == 'Test Venue', 'Paper journal missing')
@@ -325,14 +344,17 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(!submission.text.include?('Example, D.'), 'Hidden authors leaked into the citation')
     assert(submission.at_css('.publication-visual .publication-status').text == 'Required Reviews Completed', 'Place the full status on the thumbnail')
     assert(submission.at_css('.publication-citation .publication-status').nil? && !submission.at_css('.publication-citation').text.include?('Required Reviews Completed'), 'Remove submission status from the citation')
-    assert(submission.at_css('.publication-metadata').text.gsub(/\s+/, ' ').strip == '(JCR:Q1; IF:1.2)', 'Use round parentheses, colons and a semicolon without a metric year')
-    assert(submission.at_css('.publication-citation').element_children.last['class'] == 'publication-metadata', 'Metrics and status must follow the citation')
+    assert(submission.at_css('.publication-metadata').nil?, 'Submitted manuscripts must hide journal metrics even when supplied')
     assert(submission.at_css('.publication-links').nil?, 'Missing resources must not create empty link rows')
     review = home.at_css('#publication-review-fixture')
     assert(review.at_css('.publication-status').text == 'Under Review', 'Use full under-review status')
     assert(review.at_css('.publication-authors').nil?, 'Omit unsupplied authors')
     assert(review.at_css('.publication-visual').nil? && !review['class'].include?('has-preview'), 'Text-only citations must not reserve a visual column')
     assert(review.at_css('.publication-metadata').nil?, 'Status-only entries must not leave empty metric brackets')
+    editor = home.at_css('#publication-editor-fixture')
+    assert(editor.at_css('.publication-status').text == 'With Editor', 'Use the full editor-handling status in both languages')
+    assert(editor.at_css('.publication-journal').text == 'Editor Test Journal', 'Keep the submitted journal in the citation')
+    assert(!editor.at_css('.publication-citation').text.include?('With Editor'), 'Keep the status badge outside the citation')
     draft = home.at_css('#publication-draft-fixture')
     assert(draft.at_css('.publication-status').text == (prefix.empty? ? 'Manuscript in preparation' : '初稿完成'), 'Localize the unsubmitted manuscript status')
     assert(draft.at_css('.publication-journal').nil? && draft.at_css('.publication-metadata').nil?, 'Unsubmitted drafts must not imply a journal or journal metrics')
@@ -341,6 +363,8 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(accepted.at_css('.publication-venue').text == 'Food Chem.: X', 'Accepted status must preserve the standard journal abbreviation and its punctuation')
     assert(accepted.at_css('.publication-venue')['title'] == 'Food Chemistry: X', 'Accepted badge must retain the full journal name as a tooltip')
     assert(accepted.at_css('.publication-status').nil?, 'Do not display accepted as a pending status')
+    assert(accepted.at_css('.publication-metadata').text.gsub(/\s+/, ' ').strip == '(JCR:Q1; IF:1.2)', 'Accepted papers can show supplied metrics without a metric year')
+    assert(accepted.at_css('.publication-citation').element_children.last['class'] == 'publication-metadata', 'Accepted paper metrics must follow the citation')
     blog = Nokogiri::HTML(File.read(File.join(destination, prefix, 'blog/index.html')))
     assert(blog.at_css('meta[property="og:type"]')['content'] == 'website', 'The blog index is a section, not an article')
     assert(blog.css('.blog-year').empty? && blog.css('.blog-page > .nano-list').length == 1, 'Blog must use one list without year groups')
@@ -351,6 +375,11 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(post.at_css('meta[property="og:type"]')['content'] == 'article', 'Blog details need article sharing metadata')
     assert(home.css('script#MathJax-script').empty?, 'The homepage must not download unused MathJax')
     assert(post.css('script#MathJax-script').length == 1, 'A rendered formula must load MathJax once')
+    math_script = post.at_css('#MathJax-script')
+    assert(math_script['src'] == "/zqdelta/#{math_assets}/tex-mml-chtml.min.js", 'MathJax must load locally under the production baseurl')
+    assert(math_script['integrity'] == "sha256-#{[Digest::SHA256.file(File.join(destination, math_assets, 'tex-mml-chtml.min.js')).digest].pack('m0')}", 'The math engine must retain its verified integrity')
+    math_order = post.css('script[src]').select { |node| node['src'].match?(/mathjax-setup|site-math|tex-mml-chtml/) }
+    assert(math_order.all? { |node| node.key?('defer') } && math_order.map { |node| node['src'].split('/').last.split('?').first } == %w[mathjax-setup.js site-math.js tex-mml-chtml.min.js], 'Deferred formula configuration must execute before the engine')
     assert(post.at_css('.nano-back')['href'] == "/zqdelta/#{prefix}blog/#post-layout-check-2026", 'Blog return link broken')
     assert(post.css('.blog-outline .blog-toc-list a').length == 1, 'Blog outline must use real Markdown headings')
     assert(post.css('.blog-toc-inline .blog-toc-list a').length == 1, 'Narrow screens need a native inline outline')
@@ -516,24 +545,27 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(olfactory_card.at_css('.project-card-date').text == (prefix.empty? ? '2025.09—present' : '2025.09—至今'), 'Research period must remain open-ended')
     assert(olfactory_card.at_css('.project-card-kind').text == (prefix.empty? ? 'Research' : '科研'), 'Thesis project must use the research kind')
     assert(olfactory.at_css('.project-facts-overview dd').text == olfactory_card.at_css('p').text, 'Thesis overview must reuse its card description')
-    assert(olfactory.css('.nano-prose > h2').map { |heading| heading['id'] } == %w[background architecture contributions], 'Thesis section structure must match in both languages')
+    assert(olfactory.css('.nano-prose > h2').map { |heading| heading['id'] } == %w[background contributions future-research], 'Thesis section structure must match in both languages')
     assert(olfactory.css('.nano-prose > h3').length == 3, 'Thesis must retain implementation, dataset construction, and modeling subsections')
-    progress_heading = prefix.empty? ? 'Perception modeling' : '感知建模'
+    progress_heading = prefix.empty? ? 'Perception modeling and physiological information analysis' : '感知建模与生理信息分析'
     assert(olfactory.css('.nano-prose > h3').last.text == progress_heading, 'Modeling progress belongs in its work subsection')
     progress = work_text(olfactory, 2)
-    stage = prefix.empty? ? 'the modeling method remains under exploration' : '具体建模方法仍在探索中'
-    assert(progress.include?(stage), 'Thesis must retain the confirmed exploratory modeling stage')
-    assert(!olfactory.at_css('.nano-prose').text.match?(/食品条件|food matrices|food conditions|PyTorch/), 'Thesis prose must omit food-condition inputs and claims of a settled PyTorch model')
+    %w[SPKR 1.704 1.215].each { |value| assert(progress.include?(value), "SPKR method or supplied comparison missing: #{value}") }
+    assert(!olfactory.at_css('.nano-prose').text.match?(/具体建模方法仍在探索中|modeling method remains under exploration/), 'Superseded exploratory progress must be replaced by the supplied SPKR results')
     assert(!olfactory.at_css('.nano-prose').text.match?(/1,978|1978|49 名|62 个|49 unique|62 acquisition|Windows/), 'Both languages must show only the dataset actually used and omit weakly related platform details')
-    (prefix.empty? ? ['30 participants', '908 events'] : ['30 名受试者', '908 个事件']).each do |value|
+    (prefix.empty? ? ['30 participants', '908 valid events', '454 paired records'] : ['30 名受试者', '908 个有效事件', '454 对记录']).each do |value|
       assert(olfactory.at_css('.nano-prose').text.include?(value), "Supplied thesis scope missing: #{value}")
     end
-    diagram = olfactory.at_css('.nano-prose figure img')
-    assert(diagram && diagram['width'] == '2400' && diagram['height'] == '1350', 'Architecture image must reserve its original dimensions')
-    assert(diagram['src'] == '/zqdelta/assets/img/projects/olfactory-flavor-perception/system-architecture.png', 'Architecture image baseurl is incorrect')
-    assert(File.file?(File.join(destination, diagram['src'].delete_prefix('/zqdelta/'))), 'Architecture image missing from the build')
-    assert(diagram.parent.name == 'figure' && diagram.ancestors('a').empty?, 'Architecture diagram must display inline without an image link in both languages')
-    assert(!diagram.parent.at_css('figcaption').text.include?('点击图片'), 'Architecture caption must omit the removed image-link instruction')
+    assert(olfactory.css('.nano-prose figure').length == 2, 'Thesis must show the system and SPKR method figures once each')
+    assert(olfactory.at_css('figure#architecture'), 'Preserve the existing architecture anchor on its figure')
+    [['olfactory-system-architecture.png', 2026, 1176], ['spkr-method.png', 1880, 996]].each do |filename, width, height|
+      diagram = olfactory.at_css(".nano-prose figure img[src$='#{filename}']")
+      assert(diagram && diagram['width'] == width.to_s && diagram['height'] == height.to_s, 'Each figure must reserve its actual extracted dimensions')
+      assert(diagram['src'] == "/zqdelta/assets/img/projects/olfactory-flavor-perception/#{filename}", 'Figure baseurl is incorrect')
+      assert(File.file?(File.join(destination, diagram['src'].delete_prefix('/zqdelta/'))), 'Figure missing from the build')
+      assert(diagram.parent.name == 'figure' && diagram.ancestors('a').empty?, 'Figures must display inline without image links in both languages')
+      assert(!diagram.parent.at_css('figcaption').text.include?('点击图片'), 'Figure captions must omit the removed image-link instruction')
+    end
     assert(olfactory.css('.project-resources, .detail-summary, .detail-cover, .nano-prose table, .nano-prose ul, .nano-prose ol').empty?, 'Do not add placeholder resources, duplicate summaries, covers, or outcome lists')
     latest_completed = 'multimodal-sentiment-analysis'
     assert(olfactory.css('.project-previous').empty? && olfactory.at_css('.project-next')['href'].end_with?("/#{latest_completed}/"), 'Ongoing research must lead the list and link to the most recently completed project')
@@ -543,11 +575,13 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(msa.at_css('.project-previous')['href'].end_with?('/olfactory-flavor-perception/') && msa.at_css('.project-next')['href'].end_with?('/family-recipe-manager/'), 'MSA navigation must connect ongoing research and the next completed project')
     assert(msa.css('.detail-summary, .project-resources, .project-section-nav, .project-highlights').empty?, 'MSA must retain the continuous-reading layout without duplicate overview or placeholder resources')
     msa_diagram = msa.at_css('.nano-prose figure img')
-    assert(msa_diagram && msa_diagram['width'] == '2400' && msa_diagram['height'] == '1302', 'TARF architecture must reserve its original rendered aspect ratio')
-    assert(msa_diagram['src'] == '/zqdelta/assets/img/projects/multimodal-sentiment-analysis/tarf-architecture.png', 'TARF architecture asset must retain the production baseurl')
-    assert(File.file?(File.join(destination, msa_diagram['src'].delete_prefix('/zqdelta/'))), 'TARF architecture image missing from the build')
-    assert(msa_diagram.parent.name == 'figure' && msa_diagram.ancestors('a').empty?, 'TARF architecture must display inline')
-    assert(msa_diagram.parent.xpath('following-sibling::h2').first['id'] == 'contributions', 'TARF overview diagram should precede the detailed work')
+    assert(msa_diagram && msa_diagram['width'] == '1960' && msa_diagram['height'] == '1064', 'DPSR architecture must reserve its extracted dimensions')
+    assert(msa_diagram['src'] == '/zqdelta/assets/img/projects/multimodal-sentiment-analysis/dpsr-architecture.png', 'DPSR architecture asset must retain the production baseurl')
+    assert(File.file?(File.join(destination, msa_diagram['src'].delete_prefix('/zqdelta/'))), 'DPSR architecture image missing from the build')
+    assert(msa_diagram.parent.name == 'figure' && msa_diagram.ancestors('a').empty?, 'DPSR architecture must display inline')
+    assert(msa_diagram.parent.xpath('following-sibling::h2').first['id'] == 'contributions', 'DPSR overview diagram should precede the detailed work')
+    assert(!msa.at_css('.nano-prose').text.include?('TARF'), 'The active MSA page must use the new manuscript')
+    %w[0.682 49.85% 0.523 55.10%].each { |value| assert(msa.at_css('.nano-prose').text.include?(value), "DPSR result missing: #{value}") }
     following = Nokogiri::HTML(File.read(File.join(destination, prefix, 'projects/qa-following/index.html')))
     assert(following.css('.project-facts-overview dd').length == 1 && following.css('.detail-summary').empty?, 'An overview in the facts must suppress the fallback summary even without summary: false')
     assert(following.at_css('.project-previous')['href'].end_with?('/railway-knowledge/') && following.css('.project-next').empty?, 'Other undated projects must remain after all completion-dated projects')

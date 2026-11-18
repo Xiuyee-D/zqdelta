@@ -20,11 +20,11 @@ announcements:
 latest_posts:
   enabled: false
 translation_source: _pages/about-zh.md
-translation_source_sha256: 7e3a59e828a070f2438212f67e5c0a376f41a1760e418b7668b4808a4d6bb687
+translation_source_sha256: dd419a64a23f4c40443b81fe8adbfc5dc9d44137ca9cf5ff30be35348d2ee2dd
 ---
 
 <div id="about-me" class="about-biography" markdown="1">
-I am Ziqian Deng, a master's student in Control Science and Engineering at Beijing Technology and Business University. My research experience includes software and hardware development for measurement and control systems and embedded terminals. I currently focus on multimodal sentiment analysis and sensory perception using physiological signals.
+I am Ziqian Deng, a master's student in Control Science and Engineering at Beijing Technology and Business University. My research and engineering experience includes developing measurement and control software and embedded terminals, building systems for olfactory experiments, and collecting physiological signals. I currently focus on multimodal sentiment analysis and sensory evaluation using physiological signals.
 
 My research interests include:
 
