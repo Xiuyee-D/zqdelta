@@ -68,6 +68,8 @@ These cover formatting, translations, upgrade/override audits, production build,
 
 The CI browser-check runner is pinned to Ubuntu 24.04 for the locked Playwright version. Review runner compatibility when upgrading Playwright.
 
+CI replaces regional EC2 Ubuntu package mirrors with the primary Ubuntu archive before installing browser dependencies. Browser installation and regressions have separate 10- and 15-minute limits within the 30-minute job, leaving room for diagnostics when a step stalls.
+
 After template edits, review `./bin/dev bundle exec al-folio upgrade overrides audit`, accept reviewed overrides, then rerun the audit with `--fail-on-stale`. `./bin/dev translations --record` records fingerprints only after actual synchronization and formatting.
 
 Optional `./bin/dev audit` runs axe/Lighthouse; `audit-setup` installs tools locally. Lighthouse requires Node.js ≥22.19. Workflows retain site checks, CodeQL and manual deployment to `gh-pages`.

@@ -23,13 +23,21 @@ jobs:
           cache: npm
       - name: Set up the same isolated environment used locally
         run: ./bin/dev setup
+      - name: Use the primary Ubuntu mirror for browser dependencies
+        run: |
+          for apt_source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$apt_source" ] || continue
+            sudo sed -i -E 's#https?://([[:alnum:]-]+\.)?ec2\.archive\.ubuntu\.com/ubuntu/?#https://archive.ubuntu.com/ubuntu/#g' "$apt_source"
+          done
       - name: Install the CI browser
+        timeout-minutes: 10
         run: npx playwright install --with-deps --only-shell chromium firefox webkit
       - name: Verify formatting, translations, overrides and the production build
         run: ./bin/dev check --final
       - name: Check rendered local links
         run: npm run test:links
       - name: Run integration, Chromium regressions, and Firefox/WebKit coverage
+        timeout-minutes: 15
         env:
           PERSONAL_SITE_NATIVE_BROWSERS: "1"
           PERSONAL_SITE_HEADED: "1"
