@@ -25,34 +25,11 @@ function run(command, args) {
 }
 (async () => {
   if (["--all", "--integration"].includes(mode)) run("./bin/dev", ["bundle", "exec", "ruby", "test/personal_site_test.rb"]);
-  if (!["--integration", "--compatibility"].includes(mode)) {
-    if (!env.PERSONAL_SITE_URL && !run("./bin/dev", ["start"])) process.exit(1);
-    const url = `${env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta"}/`;
-    const deadline = Date.now() + 120000;
-    let ready = false;
-    while (Date.now() < deadline) {
-      try {
-        const response = await fetch(url, { signal: AbortSignal.timeout(3000) });
-        if (response.ok) {
-          ready = true;
-          break;
-        }
-      } catch {
-        /* The preview can still be starting. */
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    if (!ready) throw new Error(`Preview did not become ready: ${url}`);
-    if (mode !== "--compatibility")
-      for (const suite of ["bilingual", "projects", "blog", "navigation", "image_navigation", "return_navigation", "theme", "voice_terminal"]) {
-        run(process.execPath, [`test/personal_site_${suite}.cjs`]);
-      }
-  }
-  if (["--all", "--browser", "--compatibility"].includes(mode)) {
-    let server;
-    try {
+  let server;
+  try {
+    if (mode !== "--integration") {
       if (!process.env.PERSONAL_SITE_URL) {
-        if (!run("./bin/dev", ["build"])) process.exit(1);
+        if (!run("./bin/dev", ["build"])) throw new Error("Production build failed");
         server = fork(path.join(__dirname, "serve-built-site.cjs"), [], { cwd: root, env, stdio: ["ignore", "inherit", "inherit", "ipc"] });
         env.PERSONAL_SITE_URL = await new Promise((resolve, reject) => {
           const timeout = setTimeout(() => reject(new Error("Built-site server did not start")), 10000);
@@ -67,10 +44,31 @@ function run(command, args) {
           });
         });
       }
-      run("./bin/test-browsers", []);
-    } finally {
-      server?.kill();
+      const url = `${env.PERSONAL_SITE_URL.replace(/\/$/, "")}/`;
+      const deadline = Date.now() + 120000;
+      let ready = false;
+      while (Date.now() < deadline) {
+        try {
+          const response = await fetch(url, { signal: AbortSignal.timeout(3000) });
+          if (response.ok) {
+            ready = true;
+            break;
+          }
+        } catch {
+          /* An explicitly supplied server can still be starting. */
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      if (!ready) throw new Error(`Test site did not become ready: ${url}`);
+      if (mode !== "--compatibility") {
+        for (const suite of ["bilingual", "projects", "blog", "navigation", "image_navigation", "return_navigation", "theme", "voice_terminal"]) {
+          run(process.execPath, [`test/personal_site_${suite}.cjs`]);
+        }
+      }
+      if (["--all", "--browser", "--compatibility"].includes(mode)) run("./bin/test-browsers", []);
     }
+  } finally {
+    server?.kill();
   }
   if (failures.length) {
     console.error(`Failed checks:\n${failures.join("\n")}`);

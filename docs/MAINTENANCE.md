@@ -64,7 +64,9 @@ npm run test:links
 npm run test:site
 ```
 
-These cover formatting, translations, upgrade/override audits, production build, internal links, integration and Chromium/Firefox/WebKit regressions. Linux browser dependencies use the optional container; keep classic-scrollbar/short-viewport tests. WebKit does not establish branded Safari verification. Set `PERSONAL_SITE_URL` to test an existing static server without starting preview.
+These cover formatting, translations, upgrade/override audits, production build, internal links, integration and Chromium/Firefox/WebKit regressions. All browser suites share a temporary server for the production build, without development LiveReload. Linux browser dependencies use the optional container; keep classic-scrollbar/short-viewport tests. WebKit does not establish branded Safari verification. Set `PERSONAL_SITE_URL` to test an existing static server instead.
+
+The CI browser-check runner is pinned to Ubuntu 24.04 for the locked Playwright version. Review runner compatibility when upgrading Playwright.
 
 After template edits, review `./bin/dev bundle exec al-folio upgrade overrides audit`, accept reviewed overrides, then rerun the audit with `--fail-on-stale`. `./bin/dev translations --record` records fingerprints only after actual synchronization and formatting.
 
