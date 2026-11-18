@@ -29,6 +29,9 @@ jobs:
             [ -f "$apt_source" ] || continue
             sudo sed -i -E 's#https?://([[:alnum:]-]+\.)?ec2\.archive\.ubuntu\.com/ubuntu/?#https://archive.ubuntu.com/ubuntu/#g' "$apt_source"
           done
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            printf 'https://archive.ubuntu.com/ubuntu/\tpriority:1\nhttps://security.ubuntu.com/ubuntu/\tpriority:2\n' | sudo tee /etc/apt/apt-mirrors.txt
+          fi
       - name: Install the CI browser
         timeout-minutes: 10
         run: npx playwright install --with-deps --only-shell chromium firefox webkit
