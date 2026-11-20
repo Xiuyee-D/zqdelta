@@ -3,6 +3,7 @@ const { chromium } = require("@playwright/test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const checkProjectVideo = require("./project_video_checks.cjs");
 
 const base = process.env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta";
 const screenshots = process.env.PROJECT_UI_SCREENSHOTS;
@@ -115,6 +116,7 @@ async function stressContent(page) {
   const browser = await chromium.launch({ ignoreDefaultArgs: ["--hide-scrollbars"], args: ["--disable-features=OverlayScrollbar"] });
   let configurations = 0;
   try {
+    await checkProjectVideo(browser, base);
     for (const locale of ["/zh", ""]) {
       for (const width of [375, 768, 1440]) {
         for (const colorScheme of ["light", "dark"]) {
@@ -293,6 +295,12 @@ async function stressContent(page) {
                 ".project-facts-stack dd",
               ]);
               const slug = project.href.split("/").filter(Boolean).at(-1);
+              if (slug === "family-recipe-manager") {
+                const video = page.locator(".project-demo video");
+                const bounds = await video.boundingBox();
+                assert.ok(Math.abs(bounds.width / bounds.height - 16 / 9) < 0.01, "Demo video must preserve its full aspect ratio");
+                assert.ok(bounds.width <= 760 && bounds.x + bounds.width <= width, "Demo must stay inside the reading column");
+              }
               if (slug === "multimodal-sentiment-analysis") {
                 const diagram = page.locator('.nano-prose figure img[src$="/dpsr-architecture.png"]');
                 await diagram.scrollIntoViewIfNeeded();

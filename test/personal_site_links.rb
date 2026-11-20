@@ -14,7 +14,7 @@ checked = 0
 anchors = {}
 Dir.glob(File.join(destination, '**/*.html')).each do |file|
   document = Nokogiri::HTML(File.read(file))
-  urls = document.css('[href], [src]').flat_map { |node| %w[href src].filter_map { |attr| node[attr] } }
+  urls = document.css('[href], [src], [poster]').flat_map { |node| %w[href src poster].filter_map { |attr| node[attr] } }
   urls += document.css('[srcset]').flat_map { |node| node['srcset'].split(',').map { |part| part.strip.split(/\s+/).first } }.compact
   relative = Pathname(file).relative_path_from(Pathname(destination)).to_s
   # An emitted index.html corresponds to its directory URL.

@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const checkSummaries = require("./summary_checks.cjs");
 const checkLocalMath = require("./math_checks.cjs");
+const checkProjectVideo = require("./project_video_checks.cjs");
 const engine = process.argv[2];
 assert.ok(["firefox", "webkit"].includes(engine), "Choose firefox or webkit");
 const base = (process.env.PERSONAL_SITE_URL || "http://127.0.0.1:4000/zqdelta").replace(/\/$/, "");
@@ -243,6 +244,10 @@ async function viewer(browser) {
   report.version = browser.version();
   try {
     await checkLocalMath(browser, base);
+    // Linux WebKit's media backend stalls in our container; retain rendering checks
+    // and report playback separately instead of treating them as Safari verification.
+    // https://playwright.dev/docs/browsers#webkit
+    report.video = await checkProjectVideo(browser, base, { playback: engine !== "webkit" || process.platform !== "linux" });
     const audit = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: "light" });
     const page = await audit.newPage();
     observe(page);

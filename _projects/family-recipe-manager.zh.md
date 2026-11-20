@@ -40,6 +40,16 @@ tech_stack: [JavaScript, Vue 3, 云函数计算, Tablestore, OSS]
 
 完成用户系统，以**家庭空间**划分业务数据，设计邀请加入、空间切换、所有者转移等数据处理流程，并将**成员权限与访问校验落实到服务端**。将重复提交、离线访问、同步失败与会话失效纳入异常处理和回归验证，使成员变更与操作失败有明确的处理路径。
 
+<figure class="project-demo">
+  <video controls playsinline preload="none" width="1920" height="1080"
+    poster="{{ '/assets/video/projects/family-recipe-manager/demo-poster-zh.jpg' | relative_url }}"
+    aria-label="菜谱与食材管理功能演示" aria-describedby="recipe-demo-caption">
+    <source src="{{ '/assets/video/projects/family-recipe-manager/demo-zh.mp4' | relative_url }}" type="video/mp4">
+    <a href="{{ '/assets/video/projects/family-recipe-manager/demo-zh.mp4' | relative_url }}">观看演示视频</a>
+  </video>
+  <figcaption id="recipe-demo-caption" class="caption">菜谱与食材管理功能演示</figcaption>
+</figure>
+
 ## 项目复盘 {#reflection}
 
 ### 先梳理状态与失败路径

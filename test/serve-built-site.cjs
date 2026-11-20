@@ -20,6 +20,7 @@ const types = {
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
   ".gif": "image/gif",
+  ".mp4": "video/mp4",
   ".woff2": "font/woff2",
   ".woff": "font/woff",
   ".pdf": "application/pdf",
@@ -49,11 +50,27 @@ const server = http.createServer((request, response) => {
       file = path.join(file, "index.html");
       stat = fs.statSync(file);
     }
-    response.writeHead(200, {
+    const headers = {
       "Content-Type": types[path.extname(file)] || "application/octet-stream",
       "Content-Length": stat.size,
       "Cache-Control": cacheControl,
-    });
+      "Accept-Ranges": "bytes",
+    };
+    // Native video seeking needs byte ranges, as on the deployed static host.
+    const range = request.method === "GET" && request.headers.range?.match(/^bytes=(\d*)-(\d*)$/);
+    if (range && (range[1] || range[2])) {
+      const start = range[1] ? Number(range[1]) : Math.max(0, stat.size - Number(range[2]));
+      const end = range[1] && range[2] ? Math.min(Number(range[2]), stat.size - 1) : stat.size - 1;
+      if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= stat.size) {
+        response.writeHead(416, { "Content-Range": `bytes */${stat.size}`, "Content-Length": 0 });
+        response.end();
+        return;
+      }
+      response.writeHead(206, { ...headers, "Content-Length": end - start + 1, "Content-Range": `bytes ${start}-${end}/${stat.size}` });
+      pipeline(fs.createReadStream(file, { start, end }), response, () => {});
+      return;
+    }
+    response.writeHead(200, headers);
     if (request.method === "HEAD") response.end();
     else pipeline(fs.createReadStream(file), response, () => {});
   } catch {

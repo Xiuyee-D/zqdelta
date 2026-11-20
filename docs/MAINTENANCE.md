@@ -47,6 +47,8 @@ MathJax is served locally and loaded only on formula pages. Preserve its extensi
 
 Automatic WebPs are limited to project illustrations at 480/800px for homepage paper previews. Extend `imagemagick` inputs/sizes when adding responsive image uses.
 
+Project demo videos and their posters live together in `assets/video/projects/<slug>/`. Use the page language's media, native controls, reserved dimensions and `preload="none"`; do not autoplay or duplicate the video as a separate cover.
+
 ```bash
 ./bin/dev bundle exec ruby bin/build-profile-images.rb
 ./bin/dev bundle exec ruby bin/build-brand-icons.rb
@@ -65,6 +67,8 @@ npm run test:site
 ```
 
 These cover formatting, translations, upgrade/override audits, production build, internal links, integration and Chromium/Firefox/WebKit regressions. All browser suites share a temporary server for the production build, without development LiveReload. Linux browser dependencies use the optional container; keep classic-scrollbar/short-viewport tests. WebKit does not establish branded Safari verification. Set `PERSONAL_SITE_URL` to test an existing static server instead.
+
+Demo playback and seeking are checked in Chromium and Firefox. Linux WebKit checks posters, layout and paused state; its container media backend currently stalls, so playback remains explicitly unverified. Check videos in Safari/macOS, as recommended in [Playwright's platform notes](https://playwright.dev/docs/browsers#webkit).
 
 The CI browser-check runner is pinned to Ubuntu 24.04 for the locked Playwright version. Review runner compatibility when upgrading Playwright.
 

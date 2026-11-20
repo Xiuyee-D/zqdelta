@@ -16,7 +16,7 @@ topics: [Software engineering, Mobile applications]
 tech_stack: [JavaScript, Vue 3, Function Compute, Tablestore, OSS]
 
 translation_source: _projects/family-recipe-manager.zh.md
-translation_source_sha256: de74183020b24eb4f1b81684a398c3f0cc4e8b74dad3d0ed164eeff3486b96ee
+translation_source_sha256: 94a4c00b88ed7a7f971d72e628cda3c3d67d580a8bec77d7bf7b8724afaa6475
 ---
 
 ## Motivation {#motivation}
@@ -42,6 +42,16 @@ To accommodate different recording habits for fresh produce, packaged food, and 
 ### Household permissions and exception handling
 
 The implemented user system organizes data into **household spaces**, with workflows for invitations, space switching, and ownership transfer. **Membership permissions and access checks are enforced on the server**. Exception handling and regression verification cover duplicate submissions, offline access, synchronization failures, and expired sessions, providing defined paths for membership changes and failed operations.
+
+<figure class="project-demo">
+  <video controls playsinline preload="none" width="1920" height="1080"
+    poster="{{ '/assets/video/projects/family-recipe-manager/demo-poster-en.jpg' | relative_url }}"
+    aria-label="Recipe and ingredient management demo" aria-describedby="recipe-demo-caption">
+    <source src="{{ '/assets/video/projects/family-recipe-manager/demo-en.mp4' | relative_url }}" type="video/mp4">
+    <a href="{{ '/assets/video/projects/family-recipe-manager/demo-en.mp4' | relative_url }}">Watch the demo video</a>
+  </video>
+  <figcaption id="recipe-demo-caption" class="caption">Recipe and ingredient management demo</figcaption>
+</figure>
 
 ## Reflection {#reflection}
 

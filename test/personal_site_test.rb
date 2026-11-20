@@ -534,6 +534,13 @@ Dir.mktmpdir('zqdelta-content-') do |source|
     assert(recipe.at_css('.project-facts dd').text == recipe_card.at_css('p').text, 'Personal project facts must reuse the supplied overview')
     assert(recipe.css('.nano-prose > h2').map { |heading| heading['id'] } == %w[motivation contributions reflection], 'Personal project must retain motivation, work, and reflection sections')
     assert(recipe.css('.nano-prose > h3').length == 7 && recipe.css('.nano-prose > p').length == 9, 'Personal project must retain two motivation paragraphs, four work subsections, and three reflections')
+    demo_language = prefix.empty? ? 'en' : 'zh'
+    demo = recipe.at_css('.project-demo video')
+    assert(demo && demo['poster'] == "/zqdelta/assets/video/projects/family-recipe-manager/demo-poster-#{demo_language}.jpg", 'Recipe demo must show the poster in the page language')
+    assert(demo.at_css('source')['src'] == "/zqdelta/assets/video/projects/family-recipe-manager/demo-#{demo_language}.mp4", 'Recipe demo must play the video in the page language')
+    assert(demo.key?('controls') && demo.key?('playsinline') && demo['preload'] == 'none' && !demo.key?('autoplay'), 'Recipe demo must support native controls and inline, on-demand playback')
+    assert(demo['width'] == '1920' && demo['height'] == '1080', 'Recipe demo must reserve its real dimensions before loading')
+    assert(!recipe.at_css("##{demo['aria-describedby']}")&.text.to_s.strip.empty?, 'Recipe demo must reference a descriptive caption')
     assert(recipe.css('.project-section-nav, .project-resources, .detail-summary, .project-template-note, .nano-prose ul, .nano-prose ol').empty?, 'Personal project must use prose without invented resources, template labels, duplicate summaries, or TOC')
     recipe_previous = 'multimodal-sentiment-analysis'
     assert(recipe.at_css('.project-previous')['href'].end_with?("/#{recipe_previous}/") && recipe.at_css('.project-next')['href'].end_with?('/qa-dated/'), 'Recipe navigation must follow the localized completion-date order across categories')
